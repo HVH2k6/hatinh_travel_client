@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { store } from '@/redux/store';
-import AuthProvider from '@/auth/AuthWrapper';
+import AuthProvider from '@/components/auth/AuthWrapper';
 
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
