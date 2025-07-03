@@ -15,60 +15,61 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { saveTokens } from '@/lib/token';
 import api from '@/lib/axios';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
-import { setCredentials } from '@/redux/store/authSlice';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 const formSchema = z.object({
+  username: z.string().min(5, {
+    message: 'Tài khoản phải từ 6 ký tự trở lên.',
+  }),
   email: z.string().email('Email không hợp lệ'),
   password: z.string().min(6, {
     message: 'Mật khẩu phải từ 6 ký tự trở lên.',
   }),
+  phoneNumber: z.string().min(10, {
+    message: 'Số điện thoại phải từ 10 ký tự trở lên.',
+  }),
 });
 
-export function LoginForm() {
-  const dispatch = useDispatch<AppDispatch>();
+export function RegisterForm() {
+  
 
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      username: '',
       email: '',
       password: '',
+      phoneNumber: '',
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { email, password } = values;
+    const { email, password, username, phoneNumber } = values;
 
     try {
-      const res = await api.post('/user/sign-in', { email, password });
-      const { access_token, refresh_token } = res.data;
+      const res = await api.post('/user/sign-up', {
+        username,
+        email,
+        password,
+        phoneNumber,
+      });
 
-      // ✅ Lưu token
-      saveTokens(access_token, refresh_token);
-
-      // Sau khi gọi API:
-      dispatch(
-        setCredentials({
-          user: res.data.user, 
-          accessToken: res.data.access_token,
-        })
-      );
-
-      router.push('/');
-    
+      if (res.status === 200) {
+        toast.success('Đăng ký thành công');
+      }
+      router.push('/auth/login');
+      
     } catch (err: any) {
       console.error('Login failed:', err);
-    
-      const message ="Tài khoản hoặc mật khẩu khống hợp lệ";
-    
-      // Hiển thị lỗi chung lên field email hoặc tạo một toast/message riêng nếu muốn
+
+      const message = 'Có lỗi';
+
+      
       form.setError('email', { message });
     }
   };
@@ -76,11 +77,28 @@ export function LoginForm() {
   return (
     <Card className='max-w-sm mx-auto mt-10 shadow-lg'>
       <CardHeader>
-        <CardTitle className='text-center text-2xl'>Đăng nhập</CardTitle>
+        <CardTitle className='text-center text-2xl'>Đăng ký</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <FormField
+              control={form.control}
+              name='username'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tên người dùng</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='Nhập tên của bạn'
+                      type='text'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name='email'
@@ -112,24 +130,50 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name='phoneNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Số điện thoại</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='Nhập số điện thoại'
+                      type='text'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type='submit' className='w-full'>
-              Đăng nhập
+              Đăng ký
             </Button>
           </form>
         </Form>
-        <div className="text-center mt-4 ">
-          <Button type='button' variant='outline' className='flex items-center w-full'>
-            <Image src="/google.png" alt="google" width={24} height={24} className='mr-2'/>
+        <div className='text-center mt-4 '>
+          <Button
+            type='button'
+            variant='outline'
+            className='flex items-center w-full'
+          >
+            <Image
+              src='/google.png'
+              alt='google'
+              width={24}
+              height={24}
+              className='mr-2'
+            />
             Đăng nhập với google
           </Button>
-          <div className="flex items-center justify-between font-medium mt-3">   
-                <Link href="/auth/register" className="text-sm text-green-400 hover:text-green-600">
-                  Đăng ký
-                </Link>
-                <Link href="/auth/forgot-password" className="text-sm text-blue-500 hover:text-blue-600">
-                  Quên mật khẩu
-                </Link>
+          <div className='text-center font-medium mt-3'>
+            <Link
+              href='/auth/login'
+              className='text-sm text-green-400 hover:text-green-600'
+            >
+              Đăng nhập
+            </Link>
           </div>
         </div>
       </CardContent>

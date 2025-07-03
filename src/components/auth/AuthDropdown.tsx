@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,23 +12,33 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { IUser } from "@/interfaces/IUser";
-import ButtonLogout from "./ButonLogout";
+} from '@/components/ui/dropdown-menu';
+import { IUser } from '@/interfaces/IUser';
+import ButtonLogout from './ButonLogout';
+import Link from 'next/link';
+import { Avatar, AvatarImage } from '../ui/avatar';
 interface AuthProps {
-    auth: IUser;
-  }
-  
-export function AuthDropdown({auth}: AuthProps) {
+  auth: IUser;
+}
+
+export function AuthDropdown({ auth }: AuthProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <b>Xin chào, {auth.username}</b>
+      <DropdownMenuTrigger asChild >
+        <Avatar className='w-10 h-10'>
+          <AvatarImage src={auth.avatar} />
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-    
-        <ButtonLogout/>
+      <DropdownMenuContent className='w-56' align='end'>
+        {auth.roleId.name === 'Admin' && (
+          <DropdownMenuItem>
+            <Link href='/admin'>Admin</Link>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem>
+          <ButtonLogout />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
