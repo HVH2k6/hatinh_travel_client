@@ -24,18 +24,18 @@ interface AuthProps {
 export function AuthDropdown({ auth }: AuthProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild >
+      <DropdownMenuTrigger asChild>
         <Avatar className='w-10 h-10'>
           <AvatarImage src={auth.avatar} />
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56' align='end'>
         {auth.roleId.name === 'Admin' && (
-          <DropdownMenuItem>
-            <Link href='/admin'>Admin</Link>
+          <DropdownMenuItem className='font-medium'>
+            <Link href='/manage/dashboard' className='block w-full'>Quản lý</Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem>
+        <DropdownMenuItem className='flex items-center'>
           <ButtonLogout />
         </DropdownMenuItem>
       </DropdownMenuContent>

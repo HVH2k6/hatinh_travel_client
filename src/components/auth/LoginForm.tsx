@@ -5,15 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Form } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { saveTokens } from '@/lib/token';
 import api from '@/lib/axios';
@@ -22,6 +14,9 @@ import { AppDispatch } from '@/redux/store';
 import { setCredentials } from '@/redux/store/authSlice';
 import Image from 'next/image';
 import Link from 'next/link';
+import InputForm from '../input/InputForm';
+import InputPassword from '../input/InputPassword';
+import ButtonSubmit from '../button/ButtonSubmit';
 
 const formSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
@@ -56,18 +51,17 @@ export function LoginForm() {
       // Sau khi gọi API:
       dispatch(
         setCredentials({
-          user: res.data.user, 
+          user: res.data.user,
           accessToken: res.data.access_token,
         })
       );
 
       router.push('/');
-    
     } catch (err: any) {
       console.error('Login failed:', err);
-    
-      const message ="Tài khoản hoặc mật khẩu khống hợp lệ";
-    
+
+      const message = 'Tài khoản hoặc mật khẩu khống hợp lệ';
+
       // Hiển thị lỗi chung lên field email hoặc tạo một toast/message riêng nếu muốn
       form.setError('email', { message });
     }
@@ -81,55 +75,55 @@ export function LoginForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-            <FormField
+            <InputForm
               control={form.control}
               name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='you@example.com'
-                      type='email'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label='Email'
+              placeholder='Email'
+              type='email'
             />
 
-            <FormField
+            <InputPassword
               control={form.control}
               name='password'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu</FormLabel>
-                  <FormControl>
-                    <Input placeholder='******' type='password' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label='Mật khẩu'
+              placeholder='********'
             />
 
-            <Button type='submit' className='w-full'>
-              Đăng nhập
-            </Button>
+            <ButtonSubmit
+              isLoading={form.formState.isSubmitting}
+              text='Đăng nhập'
+            />
           </form>
         </Form>
-        <div className="text-center mt-4 ">
-          <Button type='button' variant='outline' className='flex items-center w-full'>
-            <Image src="/google.png" alt="google" width={24} height={24} className='mr-2'/>
+        <div className='text-center mt-4 '>
+          <Button
+            type='button'
+            variant='outline'
+            className='flex items-center w-full'
+          >
+            <Image
+              src='/google.png'
+              alt='google'
+              width={24}
+              height={24}
+              className='mr-2'
+            />
             Đăng nhập với google
           </Button>
-          <div className="flex items-center justify-between font-medium mt-3">   
-                <Link href="/auth/register" className="text-sm text-green-400 hover:text-green-600">
-                  Đăng ký
-                </Link>
-                <Link href="/auth/forgot-password" className="text-sm text-blue-500 hover:text-blue-600">
-                  Quên mật khẩu
-                </Link>
+          <div className='flex items-center justify-between font-medium mt-3'>
+            <Link
+              href='/auth/register'
+              className='text-sm text-green-400 hover:text-green-600'
+            >
+              Đăng ký
+            </Link>
+            <Link
+              href='/auth/forgot-password'
+              className='text-sm text-blue-500 hover:text-blue-600'
+            >
+              Quên mật khẩu
+            </Link>
           </div>
         </div>
       </CardContent>
