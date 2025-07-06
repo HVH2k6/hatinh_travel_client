@@ -19,7 +19,7 @@ isFree:boolean,
 minPrice:number,
 maxPrice:number,
 createdBy:string,
-mapUrl:string,
+mapUrl?:string,
 createdAt:Date,
 updatedAt:Date,
 slug:string

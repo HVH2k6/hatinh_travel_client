@@ -1,41 +1,52 @@
-import React from 'react'
+// components/input/InputForm.tsx
+import { Control, FieldValues, Path, useController } from 'react-hook-form'
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '../ui/form'
-import { Input } from '../ui/input'
-import { Control, FieldValues, Path } from 'react-hook-form'
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 
 interface InputFormProps<T extends FieldValues> {
   control: Control<T>
   name: Path<T>
-  label: string
+  label?: string
   placeholder?: string
-  type?: string
   className?: string
+  type?: string
+  defaultValue?: string
 }
 
-const InputForm = <T extends FieldValues>({
+export function InputForm<T extends FieldValues>({
   control,
   name,
   label,
   placeholder,
+  className,
   type = 'text',
-  className
-  
-}: InputFormProps<T>) => {
+  defaultValue,
+}: InputFormProps<T>) {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
-            <Input placeholder={placeholder} type={type} {...field} className={className}/>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              onChange={(e) =>
+                field.onChange(type === 'number' ? e.target.value : e.target.value)
+              }
+              placeholder={placeholder}
+              className={className}
+              type={type}
+              defaultValue={defaultValue}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -43,5 +54,3 @@ const InputForm = <T extends FieldValues>({
     />
   )
 }
-
-export default InputForm

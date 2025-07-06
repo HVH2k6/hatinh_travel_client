@@ -5,7 +5,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <SidebarProvider>
         <AppSidebar />
-        <main>
+        <main className="">
           <SidebarTrigger />
           {children}
         </main>

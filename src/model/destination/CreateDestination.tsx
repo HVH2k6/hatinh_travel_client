@@ -6,22 +6,27 @@ import { z } from 'zod';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormItem, FormLabel } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import InputForm from '@/components/input/InputForm';
+
 import { InputSelectCategory } from '@/components/input/InputSelectCategory';
+import { InputForm } from '@/components/input/InputForm';
+import { InputPrice } from '@/components/input/InputPrice';
+import { InputSelectedType } from '@/components/input/InputSelectedType';
+import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { InputSelectWard } from '@/components/input/InputSelectWard';
+import { STATUS } from '@/util/constant';
+import { HandleCreateDestination } from '@/action/HandleDestination';
+import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
+import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
+import { useCheckAuth } from '@/components/auth/checkauth';
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  image: z.instanceof(File),
-  list_image: z.array(z.instanceof(File)).min(1),
+  name: z.string(),
+  image: z.string().url(), // ← ✅ Thay vì z.instanceof(File)
+  list_image: z.array(z.string()),
   description: z.string(),
   categoryId: z.string(),
   typeId: z.string(),
@@ -35,29 +40,33 @@ const formSchema = z.object({
   isFree: z.boolean(),
   minPrice: z.number(),
   maxPrice: z.number(),
-  createdBy: z.string(),
-  mapUrl: z.string().url(),
+  createdBy: z.string().optional(),
+  mapUrl: z.string().optional(),
 });
 
 type FormType = z.infer<typeof formSchema>;
 
 const CreateDestination = () => {
-  const [previewMain, setPreviewMain] = useState<string | null>(null);
-  const [previewList, setPreviewList] = useState<string[]>([]);
+  const [free, setFree] = useState(false);
+  const user = useCheckAuth()
 
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      image: '',
+      list_image: [],
       description: '',
+      categoryId: '',
+      typeId: '',
       address: {
-        provinceId: '',
+        provinceId: '6864a83b662a27b3f1320469', // Hà Tĩnh
         districtId: '',
         wardId: '',
         detail: '',
       },
-      status: 'draft',
-      isFree: true,
+      status: STATUS.PENDING,
+      isFree: false,
       minPrice: 0,
       maxPrice: 0,
       createdBy: '',
@@ -65,95 +74,186 @@ const CreateDestination = () => {
     },
   });
 
-  const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      form.setValue('image', file);
-      setPreviewMain(URL.createObjectURL(file));
-    }
+  const districtId = form.watch('address.districtId');
+
+  const listStatus = [
+    {
+      value: STATUS.ACTIVE,
+      label: 'Hoạt động',
+    },
+    {
+      value: STATUS.PENDING,
+      label: 'Chờ duyệt',
+    },
+    {
+      value: STATUS.DELETED,
+      label: 'Đã xóa',
+    },
+  ];
+
+  const createdBy = user ? user._id : '';
+  const onSubmit = async (values: FormType) => {
+    values.createdBy = createdBy;
+    await HandleCreateDestination(values);
   };
 
-  const handleListImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    form.setValue('list_image', files);
-    setPreviewList(files.map((f) => URL.createObjectURL(f)));
-  };
-
-  const onSubmit = (values: FormType) => {
-    console.log('Submit:', values);
-    // Handle upload here
+  const onError = (errors: any) => {
+    console.warn('❌ Validation errors:', errors);
   };
 
   return (
-    <Card className='max-w-5xl mx-auto mt-10 w-4xl'>
+    <Card className='max-w-5xl mx-auto mt-10 w-5xl'>
       <CardHeader>
-        <CardTitle>Tạo địa điểm du lịch</CardTitle>
+        <CardTitle className='text-2xl text-center'>
+          Tạo địa điểm du lịch
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+          <form
+            onSubmit={form.handleSubmit(onSubmit, onError)}
+            className='space-y-4'
+            encType='multipart/form-data'
+          >
             <div className='grid grid-cols-2 gap-4'>
               <InputForm
                 control={form.control}
                 name='name'
                 label='Tên địa điểm du lịch'
-                placeholder='Nhập tên địa điểm du lịch'
+                placeholder='Nhập tên'
                 className='w-full'
               />
               <InputForm
                 control={form.control}
                 name='description'
-                label='Mô tả địa điểm du lịch'
-                placeholder='Nhập mô tả địa điểm du lịch'
+                label='Mô tả'
+                placeholder='Nhập mô tả'
                 className='w-full'
               />
             </div>
+
             <div className='grid grid-cols-2 gap-4'>
               <InputSelectCategory
                 control={form.control}
                 name='categoryId'
                 label='Danh mục'
               />
+              <InputSelectedType
+                control={form.control}
+                name='typeId'
+                label='Loại hình'
+              />
             </div>
             <div className='grid grid-cols-2 gap-4'>
-              <InputForm
+              <div className='flex items-center space-x-2'>
+                <Label>Miễn phí</Label>
+                <RadioGroup
+                  defaultValue='false'
+                  name='isFree'
+                  className='flex items-center space-x-2'
+                  onValueChange={(value) => {
+                    const isFreeValue = value === 'true';
+                    setFree(isFreeValue);
+                    form.setValue('isFree', isFreeValue);
+                    if (isFreeValue) {
+                      form.setValue('minPrice', 0);
+                      form.setValue('maxPrice', 0);
+                    }
+                  }}
+                >
+                  <div className='flex items-center space-x-2'>
+                    <RadioGroupItem value='false' />
+                    <Label>Không</Label>
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <RadioGroupItem value='true' />
+                    <Label>Có</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <Label>Trang thái</Label>
+                <RadioGroup
+                  defaultValue={STATUS.PENDING}
+                  name='status'
+                  className='flex items-center space-x-2'
+                  onValueChange={(value) => {
+                    form.setValue('status', value);
+                  }}
+                >
+                  {listStatus.map((item) => (
+                    <div
+                      className='flex items-center space-x-2'
+                      key={item.value}
+                    >
+                      <RadioGroupItem value={item.value} />
+                      <Label>{item.label}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <InputPrice
                 control={form.control}
                 name='minPrice'
-                label='Giá tham khảo thấp nhất'
-                placeholder='Nhập giá tham khảo thấp nhất'
+                label='Giá thấp nhất'
+                placeholder='VD: 1,000'
                 className='w-full'
+                disabled={free}
               />
-              <InputForm
+              <InputPrice
                 control={form.control}
                 name='maxPrice'
-                label='Giá tham khảo cao nhất'
-                placeholder='Nhập giá tham khảo cao nhất'
+                label='Giá cao nhất'
+                placeholder='VD: 5,000'
                 className='w-full'
+                disabled={free}
               />
             </div>
 
-            <FormItem>
-              <FormLabel>Ảnh chính</FormLabel>
-              <Input type='file' onChange={handleMainImage} />
-              {previewMain && (
-                <img src={previewMain} alt='preview' className='mt-2 h-32' />
-              )}
-            </FormItem>
+            <div className='grid grid-cols-2 gap-4'>
+              <FormItem>
+                <FormLabel>Ảnh đại diện</FormLabel>
+                <InputUploadSingleFile
+                  onUploadSuccess={(url) => {
+                    form.setValue('image', url);
+                  }}
+                />
+              </FormItem>
 
-            <FormItem>
-              <FormLabel>Danh sách ảnh</FormLabel>
-              <Input type='file' multiple onChange={handleListImages} />
-              <div className='grid grid-cols-3 gap-2 mt-2'>
-                {previewList.map((src, idx) => (
-                  <img
-                    key={idx}
-                    src={src}
-                    alt='preview'
-                    className='h-24 object-cover'
-                  />
-                ))}
+              <FormItem>
+                <FormLabel>Ảnh phụ</FormLabel>
+                <InputUploadMultipleFiles
+                  onUploadSuccess={(urls) => form.setValue('list_image', urls)}
+                />
+              </FormItem>
+            </div>
+
+            <div className='grid 2xl:grid-cols-4 gap-4'>
+              <div className='grid gap-2'>
+                <FormLabel>Tỉnh</FormLabel>
+                <Input defaultValue={'Tỉnh Hà Tĩnh'} disabled />
               </div>
-            </FormItem>
+              <InputSelectDistrict
+                control={form.control}
+                name='address.districtId'
+                label='Huyện'
+              />
+              <InputSelectWard
+                control={form.control}
+                name='address.wardId'
+                label='Xã/Phường'
+                districtId={districtId}
+              />
+              <InputForm
+                control={form.control}
+                name='address.detail'
+                label='Địa chỉ chi tiết'
+                placeholder='VD: Thôn 3, xã ABC'
+                className='w-full'
+              />
+            </div>
 
             <Button type='submit' className='w-full'>
               Tạo địa điểm

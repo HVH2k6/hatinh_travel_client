@@ -1,8 +1,8 @@
-export interface ICategory {
+export interface IType {
     _id: string;
     name: string;
     slug: string;
+    description: string;
     createdAt: Date;
     updatedAt: Date;
-    parentId: string | null;
 }

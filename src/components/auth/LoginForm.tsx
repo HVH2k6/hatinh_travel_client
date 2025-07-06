@@ -14,7 +14,7 @@ import { AppDispatch } from '@/redux/store';
 import { setCredentials } from '@/redux/store/authSlice';
 import Image from 'next/image';
 import Link from 'next/link';
-import InputForm from '../input/InputForm';
+import { InputForm } from '../input/InputForm';
 import InputPassword from '../input/InputPassword';
 import ButtonSubmit from '../button/ButtonSubmit';
 
