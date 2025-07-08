@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { InputForm } from '../input/InputForm';
 import InputPassword from '../input/InputPassword';
 import ButtonSubmit from '../button/ButtonSubmit';
+import { fetchUser } from '@/lib/authService';
 
 const formSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
@@ -40,33 +41,23 @@ export function LoginForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { email, password } = values;
-
+  
     try {
       const res = await api.post('/user/sign-in', { email, password });
       const { access_token, refresh_token } = res.data;
-
-      // ✅ Lưu token
+  
       saveTokens(access_token, refresh_token);
-
-      // Sau khi gọi API:
-      dispatch(
-        setCredentials({
-          user: res.data.user,
-          accessToken: res.data.access_token,
-        })
-      );
-
+  
+      // ✅ Gọi fetchUser để cập nhật redux ngay sau khi login
+      await fetchUser(dispatch);
+  
       router.push('/');
+      // router.refresh();
     } catch (err: any) {
       console.error('Login failed:', err);
-
-      const message = 'Tài khoản hoặc mật khẩu khống hợp lệ';
-
-      // Hiển thị lỗi chung lên field email hoặc tạo một toast/message riêng nếu muốn
-      form.setError('email', { message });
+      form.setError('email', { message: 'Tài khoản hoặc mật khẩu khống hợp lệ' });
     }
   };
-
   return (
     <Card className='max-w-sm mx-auto mt-10 shadow-lg'>
       <CardHeader>

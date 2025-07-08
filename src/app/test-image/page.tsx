@@ -1,4 +1,5 @@
-import TestImagePage from "./Test";
+import { TestImagePage } from "./Test";
+
 
 const page = () => {
     return (
