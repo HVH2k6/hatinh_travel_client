@@ -6,11 +6,11 @@ import { setCredentials } from '@/redux/store/authSlice';
 
 export const fetchUser = async (dispatch: AppDispatch) => {
   const token = getAccessToken();
-  if (!token) return;
+  
 
   try {
     const res = await api.get('/user/me');
-    dispatch(setCredentials({ user: res.data.user, accessToken: token }));
+    dispatch(setCredentials({ user: res.data.user, accessToken: token||'' }));
   } catch (err) {
     console.error('❌ Không thể fetch user sau login:', err);
   }

@@ -4,7 +4,7 @@ export const saveTokens = (access: string, refresh: string) => {
   Cookies.set('access_token', access, {
     secure: true,
     sameSite: 'Strict',
-    expires: 1, // 1 day
+    expires: 1, // 30s
     path: '/',
   });
 

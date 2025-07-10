@@ -4,7 +4,7 @@ import { revalidateTag } from 'next/cache';
 
 export const HandleCreateDestination = async (data: any) => {
   try {
-    const res = await fetch(`http://localhost:3001/api/destination/create`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/attractions/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
