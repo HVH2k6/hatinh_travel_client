@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { NavigationMenuDemo } from '../menu/menu-navgaition';
+
 import { IDistricts } from '@/interfaces/IAddress';
 import { AuthDropdown } from '../auth/AuthDropdown';
 import { useCheckAuth } from '../auth/checkauth';
 import { Button } from '../ui/button';
+import { NavigationMenuHeader } from '../menu/menu-navgaition-header';
+import Image from 'next/image';
 
 interface HeaderProps {
   districts: IDistricts[];
@@ -36,14 +38,14 @@ const Header = ({ districts }: HeaderProps) => {
 
   return (
     <header className='fixed top-0 left-0 right-0 z-50 h-16 border-b border-gray-300 flex items-center'>
-      <div className='container flex justify-between'>
+      <div className='container flex justify-between items-center'>
         <Link
           href='/'
-          className='bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text text-3xl font-bold'
+          
         >
-          HaTinhTravel
+          <Image src='/logo.png' alt='logo' width={48} height={48} className='object-cover size-12'/>
         </Link>
-        <NavigationMenuDemo menu={menuData} />
+        <NavigationMenuHeader menu={menuData} />
         {user ? (
           <AuthDropdown auth={user}/>
         ) : (

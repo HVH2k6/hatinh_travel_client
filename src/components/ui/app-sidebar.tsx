@@ -1,81 +1,62 @@
+'use client';
+
+import * as React from 'react';
 import {
-  Calendar,
-  Database,
-  Home,
-  Inbox,
-  Locate,
-  Salad,
-  Search,
-  Settings,
-  ShoppingBasket,
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,
 } from 'lucide-react';
 
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
 } from '@/components/ui/sidebar';
+import { TeamSwitcher } from './team-switcher';
+import { NavMain } from './nav-main';
 
-// Menu items.
-const items = [
-  {
-    title: 'Tổng quan',
-    url: '',
-    icon: Database,
-    isAdmin: true,
-  },
-  {
-    title: 'Địa điểm du lịch',
-    url: '/manage/destination',
-    icon: Locate,
-    isAdmin: true,
-  },
-  {
-    title: 'Đặc sản địa phương',
-    url: '/manage/local-specialty',
-    icon: Salad,
-    isAdmin: true,
-  },
-  {
-    title: 'Sản phẩm địa phương',
-    url: '/manage/product',
-    icon: ShoppingBasket,
-    isAdmin: false,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
-  },
-];
+import { NavUser } from './nav-user';
+import { menuSidebarAdmin } from '@/util/constant';
 
-export function AppSidebar() {
+// This is sample data.
+const data = {
+  user: {
+    name: 'shadcn',
+    email: 'm@example.com',
+    avatar: '/avatars/shadcn.jpg',
+  },
+  teams: [
+    {
+      name: 'Trang quản lý',
+      logo: '/logo.png',
+      
+    },
+  ],
+  navMain:menuSidebarAdmin,
+};
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
+    <Sidebar collapsible='icon' {...props}>
+      <SidebarHeader>
+        <TeamSwitcher teams={data.teams} />
+      </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <NavMain items={data.navMain} />
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={data.user} />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

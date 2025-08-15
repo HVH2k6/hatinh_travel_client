@@ -18,6 +18,7 @@ import { InputForm } from '../input/InputForm';
 import InputPassword from '../input/InputPassword';
 import ButtonSubmit from '../button/ButtonSubmit';
 import { fetchUser } from '@/lib/authService';
+import { toast } from 'react-toastify';
 
 const formSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
@@ -49,13 +50,14 @@ export function LoginForm() {
       saveTokens(access_token, refresh_token);
   
       // ✅ Gọi fetchUser để cập nhật redux ngay sau khi login
-      await fetchUser(dispatch);
-  
+        await fetchUser(dispatch);
+      toast.success('Đăng nhập thành công');
       router.push('/');
       // router.refresh();
     } catch (err: any) {
-      console.error('Login failed:', err);
-      form.setError('email', { message: 'Tài khoản hoặc mật khẩu khống hợp lệ' });
+      // console.error('Login failed:', err);
+      const errMessage = err.response.data.message
+      toast.error(errMessage);
     }
   };
   return (

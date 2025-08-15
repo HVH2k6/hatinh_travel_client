@@ -12,6 +12,6 @@ export const fetchUser = async (dispatch: AppDispatch) => {
     const res = await api.get('/user/me');
     dispatch(setCredentials({ user: res.data.user, accessToken: token||'' }));
   } catch (err) {
-    console.error('❌ Không thể fetch user sau login:', err);
+    console.error(err);
   }
 };

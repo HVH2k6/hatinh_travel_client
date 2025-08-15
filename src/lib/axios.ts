@@ -41,7 +41,8 @@ api.interceptors.response.use(
         return api(originalConfig);
       } catch (err) {
         clearTokens();
-        return Promise.reject(new Error('Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.'));
+        // return Promise.reject(new Error('Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.'));
+        
       }
     }
 

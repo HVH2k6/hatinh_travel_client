@@ -22,11 +22,11 @@ interface IMenu {
     }[];
   }
   
-interface NavigationMenuDemoProps {
+interface NavigationMenuHeaderProps {
   menu: IMenu[];
 }
 
-export function NavigationMenuDemo({ menu }: NavigationMenuDemoProps) {
+export function NavigationMenuHeader({ menu }: NavigationMenuHeaderProps) {
     return (
       <NavigationMenu viewport={false}>
         <NavigationMenuList>

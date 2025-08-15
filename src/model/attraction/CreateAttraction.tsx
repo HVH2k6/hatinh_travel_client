@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/card';
 import { InputForm } from '@/components/input/InputForm';
 import { STATUS, getProvinces } from '@/util/constant';
-import { Button } from '@/components/ui/button';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 import { InputPrice } from '@/components/input/InputPrice';
 import { InputSelectCategory } from '@/components/input/InputSelectCategory';
@@ -29,8 +28,9 @@ import { useCheckAuth } from '@/components/auth/checkauth';
 import { Input } from '@/components/ui/input';
 import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
 import { InputSelectWard } from '@/components/input/InputSelectWard';
-import { HandleCreateDestination } from '@/action/HandleDestination';
+
 import { toast } from 'react-toastify';
+import { HandleCreateAttraction } from '@/action/HandleAttraction ';
 
 export const formSchema = z.object({
   name: z.string().min(5, { message: 'Tên địa điểm phải từ 5 ký tự trở lên.' }),
@@ -56,7 +56,7 @@ export const formSchema = z.object({
 
 type FormType = z.infer<typeof formSchema>;
 
-const CreateDestination = () => {
+const CreateAttraction  = () => {
   const [free, setFree] = useState(false);
   const [provinces, setProvinces] = useState<any[]>([]);
   const [loadingProvinces, setLoadingProvinces] = useState(true);
@@ -109,7 +109,7 @@ const CreateDestination = () => {
   const handleSubmit = async (values: FormType) => {
 // add createdBy
     values.createdBy = user?._id;
-    const response = await HandleCreateDestination(values);
+    const response = await HandleCreateAttraction(values);
 
     if (response) {
       toast.success('Tạo thành công');
@@ -246,4 +246,4 @@ const CreateDestination = () => {
   );
 };
 
-export default CreateDestination;
+export default CreateAttraction ;
