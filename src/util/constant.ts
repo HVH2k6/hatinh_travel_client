@@ -32,11 +32,11 @@ export const getProvinces = async () => {
       items: [
         {
           title: 'Danh sách địa điểm',
-          url: '/manage/attraction',
+          url: '/quan-ly/dia-diem-du-lich',
         },
         {
           title: 'Tạo mới địa điểm',
-          url: '/manage/attraction/create',
+          url: '/quan-ly/dia-diem-du-lich/tao-moi',
         },
         
       ],

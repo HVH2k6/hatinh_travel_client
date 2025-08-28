@@ -22,7 +22,7 @@ import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 
 import { toast } from 'react-toastify';
-import { HandleCreateAttraction, HandleUpdateAttraction } from '@/action/HandleAttraction ';
+import { HandleCreateAttraction, HandleUpdateAttraction } from '@/action/HandleAttraction';
 import { IAttraction } from '@/interfaces/IAttraction';
 import { useRouter } from 'next/navigation';
 

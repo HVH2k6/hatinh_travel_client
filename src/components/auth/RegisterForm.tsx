@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -14,28 +14,21 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import api from '@/lib/axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
+import InputSendOtp from '../input/InputOtp';
 
 const formSchema = z.object({
-  username: z.string().min(5, {
-    message: 'Tài khoản phải từ 6 ký tự trở lên.',
-  }),
+  username: z.string().min(5, { message: 'Tên người dùng phải từ 5 ký tự trở lên.' }),
   email: z.string().email('Email không hợp lệ'),
-  password: z.string().min(6, {
-    message: 'Mật khẩu phải từ 6 ký tự trở lên.',
-  }),
-  phoneNumber: z.string().min(10, {
-    message: 'Số điện thoại phải từ 10 ký tự trở lên.',
-  }),
+  code: z.string().length(6, { message: 'OTP gồm 6 số' }),
+  password: z.string().min(6, { message: 'Mật khẩu phải từ 6 ký tự trở lên.' }),
+  phoneNumber: z.string().min(10, { message: 'Số điện thoại phải từ 10 ký tự trở lên.' }),
 });
 
 export function RegisterForm() {
-  
-
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,140 +36,139 @@ export function RegisterForm() {
     defaultValues: {
       username: '',
       email: '',
+      code: '',
       password: '',
       phoneNumber: '',
     },
+    mode: 'onTouched',
   });
 
+  const email = useWatch({ control: form.control, name: 'email' });
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { email, password, username, phoneNumber } = values;
-
     try {
-      const res = await api.post('/user/sign-up', {
-        username,
-        email,
-        password,
-        phoneNumber,
-      });
-
-      if (res.status === 200) {
+      const res = await api.post('/user/sign-up', values);
+      if (res.status === 200 || res.status === 201) {
         toast.success('Đăng ký thành công');
+        router.push('/tai-khoan/dang-nhap');
+        return;
       }
-      router.push('/auth/login');
-      
+      toast.error('Đăng ký thất bại, vui lòng thử lại');
     } catch (err: any) {
-      console.error('Login failed:', err);
-
-      const message = 'Có lỗi';
-
-      
-      form.setError('email', { message });
+      const message = err?.response?.data?.message || 'Có lỗi';
+      toast.error(message);
+      if (message.toLowerCase().includes('email')) {
+        form.setError('email', { message });
+      } else if (message.toLowerCase().includes('otp')) {
+        form.setError('code', { message });
+      }
     }
   };
 
   return (
-    <Card className='max-w-sm mx-auto mt-10 shadow-lg'>
-      <CardHeader>
-        <CardTitle className='text-center text-2xl'>Đăng ký</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-            <FormField
-              control={form.control}
-              name='username'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tên người dùng</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Nhập tên của bạn'
-                      type='text'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='you@example.com'
-                      type='email'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className="mx-auto mt-10 w-full max-w-sm">
+      <h1 className="text-3xl font-semibold tracking-tight text-sky-600">Register</h1>
+      <p className="text-sm text-muted-foreground mb-6">Tạo tài khoản mới để bắt đầu trải nghiệm</p>
 
-            <FormField
-              control={form.control}
-              name='password'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu</FormLabel>
-                  <FormControl>
-                    <Input placeholder='******' type='password' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='phoneNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Số điện thoại</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Nhập số điện thoại'
-                      type='text'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type='submit' className='w-full'>
-              Đăng ký
-            </Button>
-          </form>
-        </Form>
-        <div className='text-center mt-4 '>
-          <Button
-            type='button'
-            variant='outline'
-            className='flex items-center w-full'
-          >
-            <Image
-              src='/google.png'
-              alt='google'
-              width={24}
-              height={24}
-              className='mr-2'
-            />
-            Đăng nhập với google
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tên người dùng</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nhập tên của bạn" autoComplete="username" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="you@example.com" type="email" autoComplete="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <InputSendOtp
+            control={form.control}
+            name="code"
+            label="Mã OTP"
+            email={email || ''}
+            countdownSeconds={300}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Mật khẩu</FormLabel>
+                <FormControl>
+                  <Input placeholder="******" type="password" autoComplete="new-password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Số điện thoại</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nhập số điện thoại" type="tel" autoComplete="tel" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit" className="w-full h-11">
+            Đăng ký
           </Button>
-          <div className='text-center font-medium mt-3'>
-            <Link
-              href='/auth/login'
-              className='text-sm text-green-400 hover:text-green-600'
-            >
+
+          {/* Divider */}
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground">OR</span>
+            </div>
+          </div>
+
+          <Button type="button" variant="outline" className="flex w-full items-center justify-center h-11">
+            <Image
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="google"
+              width={20}
+              height={20}
+              className="mr-2"
+            />
+            Đăng ký với Google
+          </Button>
+
+          <p className="text-sm text-center text-muted-foreground mt-3">
+            Bạn đã có tài khoản?{' '}
+            <Link href="/tai-khoan/dang-nhap" className="text-sky-600 hover:text-sky-700 font-medium">
               Đăng nhập
             </Link>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          </p>
+        </form>
+      </Form>
+    </div>
   );
 }

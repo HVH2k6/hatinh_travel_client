@@ -50,7 +50,7 @@ const Header = ({ districts }: HeaderProps) => {
           <AuthDropdown auth={user}/>
         ) : (
           <Button variant='outline'>
-            <Link href='/auth/login'>Đăng nhập</Link>
+            <Link href='/tai-khoan/dang-nhap'>Đăng nhập</Link>
           </Button>
         )}
       </div>

@@ -9,8 +9,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='vi'>
-      <body>
+    <html lang='vi' className="mdl-js" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <NextTopLoader color='#3b82f6' showSpinner={false} />
         <ClientLayout>
           <ToastProvider>{children}</ToastProvider>

@@ -23,7 +23,7 @@ export function AuthDropdown({ auth }: AuthProps) {
       <DropdownMenuContent className='w-56' align='end'>
         {auth.roleId.name === 'Admin' && (
           <DropdownMenuItem className='font-medium'>
-            <Link href='/manage/dashboard' className='block w-full'>Quản lý</Link>
+            <Link href='/quan-ly/tong-quan' className='block w-full'>Quản lý</Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem className='flex items-center'>

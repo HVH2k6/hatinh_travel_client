@@ -49,7 +49,7 @@ axiosInstance.interceptors.response.use(
         // Xóa token nếu không có refresh token
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
-        window.location.href = '/auth/login'; // Điều hướng đến trang đăng nhập
+       
         return Promise.reject(error);
       }
 
@@ -73,7 +73,7 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
-        window.location.href = '/auth/login'; // Điều hướng đến trang đăng nhập
+        
         return Promise.reject(refreshError);
       }
     }

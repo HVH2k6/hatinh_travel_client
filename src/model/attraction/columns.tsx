@@ -11,7 +11,7 @@ import { toast } from "react-toastify"
 import * as React from "react"
 import Swal from "sweetalert2"
 import "sweetalert2/dist/sweetalert2.min.css"
-import { HandleDeleteAttraction } from "@/action/HandleAttraction "
+import { HandleDeleteAttraction } from "@/action/HandleAttraction"
 
 function ActionsCell({ id }: { id: string }) {
   const [isDeleting, setIsDeleting] = React.useState(false)
