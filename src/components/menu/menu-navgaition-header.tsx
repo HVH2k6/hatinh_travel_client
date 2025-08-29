@@ -34,13 +34,13 @@ export function NavigationMenuHeader({ menu }: NavigationMenuHeaderProps) {
             <NavigationMenuItem key={index}>
               {item.isSubMenu ? (
                 <>
-                  <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className='hover:bg-green-400/35'>{item.title}</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid grid-cols-2 gap-2 p-4 w-[450px]">
                       {item.children?.map((child, idx) => (
                         <li key={idx}>
                           <NavigationMenuLink asChild>
-                            <Link href={child.url}>
+                            <Link href={child.url}    className="block rounded-md px-3 py-2 text-sm transition-colors hover:bg-green-400/35">
                               <div className="text-sm font-medium leading-none">{child.title}</div>
                             </Link>
                           </NavigationMenuLink>
@@ -52,7 +52,7 @@ export function NavigationMenuHeader({ menu }: NavigationMenuHeaderProps) {
               ) : (
                 <NavigationMenuLink
                   asChild
-                  className={navigationMenuTriggerStyle()}
+                  className={navigationMenuTriggerStyle() + ' hover:bg-green-400/35'}
                 >
                   <Link href={item.url ?? '#'}>{item.title}</Link>
                 </NavigationMenuLink>
