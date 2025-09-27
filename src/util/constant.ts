@@ -1,4 +1,4 @@
-import { Map, SquareTerminal } from "lucide-react";
+import { Map, SquareMenu, SquareTerminal } from "lucide-react";
 
 export const STATUS = {
     ACTIVE: 'active',
@@ -37,6 +37,23 @@ export const getProvinces = async () => {
         {
           title: 'Tạo mới địa điểm',
           url: '/quan-ly/dia-diem-du-lich/tao-moi',
+        },
+        
+      ],
+    },
+        {
+      title: 'Danh mục',
+      url: '#',
+      icon: SquareMenu,
+      
+      items: [
+        {
+          title: 'Danh sách danh mục',
+          url: '/quan-ly/danh-muc',
+        },
+        {
+          title: 'Tạo mới địa điểm',
+          url: '/quan-ly/danh-muc/tao-moi',
         },
         
       ],

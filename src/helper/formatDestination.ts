@@ -25,6 +25,8 @@ export function mapRawDataToattraction(rawData: any[]): IAttraction [] {
       createdAt: new Date(item.createdAt),
       updatedAt: new Date(item.updatedAt),
       slug: item.slug,
+      openTime: item.openTime,
+      closeTime: item.closeTime,
   
       // 👇️ These two can be optionally added if you're also using them in UI
       categoryName: item.categoryId?.name || '',

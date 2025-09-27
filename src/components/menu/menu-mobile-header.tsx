@@ -1,50 +1,17 @@
 'use client';
 
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { Menu } from 'lucide-react';
-import { useState, Fragment } from 'react';
-import { Button } from '../ui/button';
+import { useState } from 'react';
 import Link from 'next/link';
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
+} from '@/components/ui/sheet';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import { Menu } from 'lucide-react';
 import { IDistricts } from '@/interfaces/IAddress';
 
 export default function MenuMobileHeader({ districts }: { districts: IDistricts[] }) {
   const [open, setOpen] = useState(false);
-
-  // Reusable section for districts
-  const DistrictSection = ({
-    title,
-    prefix,
-  }: {
-    title: string;
-    prefix: 'dia-diem' | 'dac-san';
-  }) => (
-    <AccordionItem value={prefix}>
-      <AccordionTrigger className="px-3 py-2 rounded-md text-left hover:no-underline hover:bg-accent">
-        {title}
-      </AccordionTrigger>
-      <AccordionContent className="px-1 pt-1 pb-2">
-        <div className="grid gap-1">
-          {districts.map((d) => (
-            <Link
-              key={`${prefix}-${d.codename}`}
-              href={`/${prefix}/${d.codename}`}
-              onClick={() => setOpen(false)}
-              className="block rounded-md px-3 py-1.5 hover:bg-accent"
-            >
-              {d.name}
-            </Link>
-          ))}
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-  );
 
   return (
     <div className="lg:hidden">
@@ -60,25 +27,61 @@ export default function MenuMobileHeader({ districts }: { districts: IDistricts[
             <SheetTitle>Khám phá Hà Tĩnh</SheetTitle>
           </SheetHeader>
 
-          {/* Scrollable area to avoid long content overflow */}
-          <nav className="mt-4 text-sm max-h-[calc(100vh-110px)] overflow-y-auto pr-1 space-y-3">
+          <nav className="mt-4 space-y-2 text-sm">
             <Link
               href="/"
               onClick={() => setOpen(false)}
-              className="block rounded-md px-3 py-2 hover:bg-accent"
+              className="block rounded-lg px-3 py-2 hover:bg-primary/10"
             >
               Trang chủ
             </Link>
 
-            <Accordion type="multiple" className="space-y-2">
-              <DistrictSection title="Địa điểm du lịch" prefix="dia-diem" />
-              <DistrictSection title="Đặc sản địa phương" prefix="dac-san" />
+            <Accordion type="multiple" className="px-1">
+              <AccordionItem value="attractions" className="border-none">
+                <AccordionTrigger className="rounded-lg px-3 py-2 hover:bg-primary/10">
+                  Địa điểm du lịch
+                </AccordionTrigger>
+                <AccordionContent className="pl-3">
+                  <div className="grid gap-1">
+                    {districts.slice(0, 16).map((d) => (
+                      <Link
+                        key={d.codename}
+                        href={`/dia-diem/${d.codename}`}
+                        onClick={() => setOpen(false)}
+                        className="rounded-md px-3 py-1.5 hover:bg-accent"
+                      >
+                        {d.name}
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="specialties" className="border-none">
+                <AccordionTrigger className="rounded-lg px-3 py-2 hover:bg-primary/10">
+                  Đặc sản địa phương
+                </AccordionTrigger>
+                <AccordionContent className="pl-3">
+                  <div className="grid gap-1">
+                    {districts.slice(0, 16).map((d) => (
+                      <Link
+                        key={d.codename}
+                        href={`/dac-san/${d.codename}`}
+                        onClick={() => setOpen(false)}
+                        className="rounded-md px-3 py-1.5 hover:bg-accent"
+                      >
+                        {d.name}
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
 
             <Link
               href="/kham-pha-cho"
               onClick={() => setOpen(false)}
-              className="block rounded-md px-3 py-2 hover:bg-accent"
+              className="block rounded-lg px-3 py-2 hover:bg-primary/10"
             >
               Khám phá chợ
             </Link>

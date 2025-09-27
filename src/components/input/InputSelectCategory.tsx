@@ -47,10 +47,12 @@ export function InputSelectCategory<T extends FieldValues>({
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category`, {
           cache: 'no-store',
         })
+        
         const data = await res.json()
 
-        if (data?.categories) {
-          const all = data.categories as ICategory[]
+        if (data?.data) {
+          const all = data.data as ICategory[]
+          console.log("🚀 ~ fetchCategories ~ all:", all)
 
           if (allowedSlugs && allowedSlugs.length > 0) {
             const filteredCategories = all.filter((cat) =>

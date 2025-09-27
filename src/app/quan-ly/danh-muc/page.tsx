@@ -1,12 +1,9 @@
 import AttractionsTable from '@/model/attraction/AttractionsTable';
 import { getAttractions } from '@/model/attraction/pagination';
+import CategoryTable from '@/model/category/CategoryTable';
+import { getCategories } from '@/model/category/pagination';
 import { pagination } from '@/util/constant';
-import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Danh sách địa điểm du lịch',
-  description: 'Trang quản lý danh sách địa điểm du lịch',
-};
 export default async function AttractionsPage({
   searchParams: searchParamsPromise,
 }: {
@@ -17,13 +14,13 @@ export default async function AttractionsPage({
   const page = searchParams.page || pagination.page;
   const limit = searchParams.limit || pagination.limit;
 
-  const result = await getAttractions({ page, limit });
+  const result = await getCategories({ page, limit });
   if(!result.data) return <p>Không có dữ liệu</p>
   
 
   return (
     <div className='p-6 space-y-4'>
-      <AttractionsTable data={result.data}  />
+      <CategoryTable data={result.data}  />
     </div>
   );
 }

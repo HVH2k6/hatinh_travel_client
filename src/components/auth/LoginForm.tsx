@@ -143,12 +143,12 @@ export function LoginForm() {
           </Button>
 
           <p className="text-sm text-center text-muted-foreground mt-3">
-            Don’t have an account?{' '}
+            Bạn chưa có tài khoản?{' '}
             <Link
-              href="/auth/register"
+              href="/tai-khoan/dang-ky"
               className="text-sky-600 hover:text-sky-700 font-medium"
             >
-              Register Now
+              Đăng ký tài khoản
             </Link>
           </p>
         </form>

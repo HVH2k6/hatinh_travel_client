@@ -1,62 +1,176 @@
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { Form } from '@/components/ui/form';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
 import { InputForm } from '@/components/input/InputForm';
-import { STATUS, getProvinces } from '@/util/constant';
-import ButtonSubmit from '@/components/button/ButtonSubmit';
 import { InputPrice } from '@/components/input/InputPrice';
 import { InputSelectCategory } from '@/components/input/InputSelectCategory';
 import { InputSelectedType } from '@/components/input/InputSelectedType';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
-import { Label } from '@/components/ui/label';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useCheckAuth } from '@/components/auth/checkauth';
-import { Input } from '@/components/ui/input';
 import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
 import { InputSelectWard } from '@/components/input/InputSelectWard';
-import { toast } from 'react-toastify';
-import { HandleCreateAttraction } from '@/action/HandleAttraction';
+import ButtonSubmit from '@/components/button/ButtonSubmit';
 import RichText from '@/components/editor/RichText';
 
-export const formSchema = z.object({
-  name: z.string().min(5, { message: 'Tên địa điểm phải từ 5 ký tự trở lên.' }),
-  image: z.string().url({ message: 'Vui lòng chọn hình ảnh hợp lệ (dạng URL).' }),
-  list_image: z
-    .array(z.string().url({ message: 'Mỗi hình ảnh phải là một URL hợp lệ.' }))
-    .min(1, { message: 'Cần ít nhất một hình ảnh mô tả.' }),
-  description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
-  categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
-  typeId: z.string().min(1, { message: 'Vui lòng chọn loại địa điểm.' }),
-  address: z.object({
-    provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-    districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
-    wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
-    detail: z.string().optional(),
-  }),
-  status: z.enum([STATUS.ACTIVE, STATUS.PENDING, STATUS.DELETED], {
-    required_error: 'Vui lòng chọn trạng thái.',
-  }),
-  isFree: z.boolean(),
-  minPrice: z
-    .number({ required_error: 'Vui lòng nhập giá tối thiểu.', invalid_type_error: 'Giá tối thiểu phải là số.' })
-    .nonnegative({ message: 'Giá tối thiểu không được âm.' }),
-  maxPrice: z
-    .number({ required_error: 'Vui lòng nhập giá tối đa.', invalid_type_error: 'Giá tối đa phải là số.' })
-    .nonnegative({ message: 'Giá tối đa không được âm.' }),
-  createdBy: z.string().optional(),
-});
+import { STATUS, getProvinces } from '@/util/constant';
+import { useCheckAuth } from '@/components/auth/checkauth';
+import { toast } from 'react-toastify';
+
+/* ============================ TIME SELECT ============================ */
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+function TimeSelect({
+  value,
+  onChange,
+  placeholder = '--',
+  hourLabel = 'Giờ',
+  minuteLabel = 'Phút',
+  className = '',
+}: {
+  value?: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  hourLabel?: string;
+  minuteLabel?: string;
+  className?: string;
+}) {
+  const [h, m] = (value || '').split(':');
+  const hour = HOURS.includes(h) ? h : '';
+  const minute = MINUTES.includes(m) ? m : '';
+
+  const update = (hh: string, mm: string) => {
+    if (hh && mm) onChange(`${hh}:${mm}`);
+    else onChange('');
+  };
+
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      <div className="flex items-center gap-2">
+        <label className="sr-only">{hourLabel}</label>
+        <select
+          className="h-10 rounded-md border bg-background px-2"
+          value={hour}
+          onChange={(e) => update(e.target.value, minute)}
+          aria-label={hourLabel}
+        >
+          <option value="">{placeholder}</option>
+          {HOURS.map((x) => (
+            <option key={x} value={x}>
+              {x}
+            </option>
+          ))}
+        </select>
+
+        <span className="text-muted-foreground">:</span>
+
+        <label className="sr-only">{minuteLabel}</label>
+        <select
+          className="h-10 rounded-md border bg-background px-2"
+          value={minute}
+          onChange={(e) => update(hour, e.target.value)}
+          aria-label={minuteLabel}
+        >
+          <option value="">{placeholder}</option>
+          {MINUTES.map((x) => (
+            <option key={x} value={x}>
+              {x}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {value ? (
+        <button
+          type="button"
+          onClick={() => onChange('')}
+          className="text-xs text-muted-foreground hover:underline"
+          aria-label="Xoá giờ đã chọn"
+        >
+          Xoá
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+/* ============================ SCHEMA ============================ */
+
+export const formSchema = z
+  .object({
+    name: z.string().min(5, { message: 'Tên địa điểm phải từ 5 ký tự trở lên.' }),
+    image: z.string().url({ message: 'Vui lòng chọn hình ảnh hợp lệ (dạng URL).' }),
+    list_image: z
+      .array(z.string().url({ message: 'Mỗi hình ảnh phải là một URL hợp lệ.' }))
+      .min(1, { message: 'Cần ít nhất một hình ảnh mô tả.' }),
+    description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
+    categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
+    typeId: z.string().min(1, { message: 'Vui lòng chọn loại địa điểm.' }),
+    address: z.object({
+      provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
+      districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
+      wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
+      detail: z.string().optional(),
+    }),
+    status: z.enum([STATUS.ACTIVE, STATUS.PENDING, STATUS.DELETED], {
+      required_error: 'Vui lòng chọn trạng thái.',
+    }),
+    isFree: z.boolean(),
+    minPrice: z
+      .number({ required_error: 'Vui lòng nhập giá tối thiểu.', invalid_type_error: 'Giá tối thiểu phải là số.' })
+      .nonnegative({ message: 'Giá tối thiểu không được âm.' }),
+    maxPrice: z
+      .number({ required_error: 'Vui lòng nhập giá tối đa.', invalid_type_error: 'Giá tối đa phải là số.' })
+      .nonnegative({ message: 'Giá tối đa không được âm.' }),
+
+    // Time HH:mm (optional)
+    openTime: z
+      .string()
+      .optional()
+      .refine((v) => !v || timeRegex.test(v), { message: 'Định dạng giờ phải là HH:mm (vd: 08:30).' }),
+    closeTime: z
+      .string()
+      .optional()
+      .refine((v) => !v || timeRegex.test(v), { message: 'Định dạng giờ phải là HH:mm (vd: 17:30).' }),
+
+    createdBy: z.string().optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.openTime && val.closeTime && timeRegex.test(val.openTime) && timeRegex.test(val.closeTime)) {
+      const toMin = (s: string) => {
+        const [h, m] = s.split(':').map(Number);
+        return h * 60 + m;
+      };
+      if (toMin(val.closeTime) < toMin(val.openTime)) {
+        ctx.addIssue({
+          path: ['closeTime'],
+          code: z.ZodIssueCode.custom,
+          message: 'Giờ đóng cửa phải sau giờ mở cửa (nếu qua đêm, để trống để bỏ kiểm tra).',
+        });
+      }
+    }
+  });
 
 type FormType = z.infer<typeof formSchema>;
 type Labels = { categoryName: string; typeName: string; provinceName: string; districtName: string; wardName: string };
 
+/* ============================ COMPONENT ============================ */
+
+import { HandleCreateAttraction } from '@/action/HandleAttraction';
+
 const CreateAttraction = () => {
-  // ---------------- state & form ----------------
   const [free, setFree] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const user = useCheckAuth();
@@ -84,17 +198,19 @@ const CreateAttraction = () => {
       isFree: false,
       minPrice: 0,
       maxPrice: 0,
+      openTime: '', // để trống -> backend tự default nếu muốn
+      closeTime: '',
       createdBy: user?._id,
     },
   });
 
   const districtId = form.watch('address.districtId');
 
-  // ---------------- effects ----------------
+  /* ---------- Effects ---------- */
   useEffect(() => {
     (async () => {
       const result = await getProvinces();
-      setProvinces(result);
+      setProvinces(result || []);
       if (result?.length) {
         form.setValue('address.provinceId', result[0]._id);
         setLabels((s) => ({ ...s, provinceName: result[0].name || '' }));
@@ -105,117 +221,14 @@ const CreateAttraction = () => {
 
   const listStatus = useMemo(
     () => [
-      { value: STATUS.ACTIVE, label: 'Hoạt động' },
-      { value: STATUS.PENDING, label: 'Chờ duyệt' },
-      { value: STATUS.DELETED, label: 'Đã xóa' },
+      { value: STATUS.ACTIVE, label: 'Hoạt động' },
+      { value: STATUS.PENDING, label: 'Chờ duyệt' },
+      { value: STATUS.DELETED, label: 'Đã xoá' },
     ],
     []
   );
 
-  // ---------------- helpers: AI & ẢNH WEB ----------------
-  type WebPhoto = { src: string; alt?: string; author?: string; link?: string };
-
-  // Gọi route Pexels đã tạo: /api/media/search-photos
-  async function searchPhotos(query: string, perPage = 4) {
-    const res = await fetch('/api/media/search-photos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query,
-        perPage,
-        orientation: 'landscape',
-        locale: 'vi-VN',
-      }),
-    });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return (json.photos as WebPhoto[]) || [];
-  }
-
-  // Tạo 1 <figure> đẹp + credit
-  function makeFigureHTML(p: WebPhoto) {
-    return `
-<figure style="margin:12px 0;border-radius:12px;overflow:hidden;">
-  <img src="${p.src}" alt="${p.alt || 'Ảnh minh họa'}"
-       style="width:100%;height:220px;object-fit:cover;display:block;" />
-  <figcaption style="font-size:12px;color:#6b7280;margin-top:6px;">
-    ${p.author ? `Photo by ${p.author}` : 'Photo'}${
-      p.link ? ` on <a href="${p.link}" target="_blank" rel="nofollow noopener">Pexels</a>` : ''
-    }
-  </figcaption>
-</figure>`;
-  }
-
-  /**
-   * Chèn ảnh vào content theo các mục:
-   * - Sau <h3>Giới thiệu</h3>
-   * - Sau <h3>Trải nghiệm</h3> / <h3>Trải nghiệm gợi ý</h3>
-   * - Sau <h3>Ẩm thực</h3> hoặc "Ẩm thực & dịch vụ"
-   * - Sau <h3>Giá/Phí</h3>
-   * Ảnh dư -> thêm cuối bài.
-   */
-  function injectImagesIntoHtml(html: string, photos: WebPhoto[]) {
-    if (!photos?.length || !html) return html;
-
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      const slots = [/giới thiệu/i, /trải nghiệm/i, /(ẩm thực|dịch vụ)/i, /(giá\s*\/?\s*phí|giá|phí)/i];
-
-      let used = 0;
-      const h3s = Array.from(doc.querySelectorAll('h3'));
-
-      // helper: tìm element sau heading để chèn
-      const findAnchorAfter = (h3: Element): Element => {
-        let el: Element | null = h3.nextElementSibling;
-        while (el) {
-          const tag = el.tagName.toLowerCase();
-          if (['p', 'ul', 'ol', 'table'].includes(tag)) return el;
-          if (['h2', 'h3', 'h4'].includes(tag)) break;
-          el = el.nextElementSibling;
-        }
-        return h3;
-      };
-
-      for (const slot of slots) {
-        if (used >= photos.length) break;
-        const targetH3 = h3s.find((h) => slot.test(h.textContent || ''));
-        if (!targetH3) continue;
-        const anchor = findAnchorAfter(targetH3);
-
-        const wrapper = doc.createElement('div');
-        wrapper.innerHTML = makeFigureHTML(photos[used++]);
-        const node = wrapper.firstElementChild!;
-        anchor.parentNode?.insertBefore(node, anchor.nextSibling);
-      }
-
-      // Ảnh còn dư -> cuối bài
-      while (used < photos.length) {
-        const wrapper = doc.createElement('div');
-        wrapper.innerHTML = makeFigureHTML(photos[used++]);
-        const node = wrapper.firstElementChild!;
-        doc.body.appendChild(node);
-      }
-
-      return doc.body.innerHTML;
-    } catch {
-      // Fallback regex: chèn ngay sau <h3> khớp tiêu đề
-      let out = html;
-      const regs = [
-        /(<h3[^>]*>[^<]*Giới thiệu[^<]*<\/h3>)/i,
-        /(<h3[^>]*>[^<]*Trải nghiệm[^<]*<\/h3>)/i,
-        /(<h3[^>]*>[^<]*(Ẩm thực|dịch vụ)[^<]*<\/h3>)/i,
-        /(<h3[^>]*>[^<]*(Giá\s*\/?\s*Phí|Giá|Phí)[^<]*<\/h3>)/i,
-      ];
-      photos.forEach((p, i) => {
-        if (!regs[i]) return;
-        out = out.replace(regs[i], `$1${makeFigureHTML(p)}`);
-      });
-      return out;
-    }
-  }
-
+  /* ---------- AI helper ---------- */
   async function generateAiDescriptionStrict(v: FormType, lbls: Labels) {
     const provinceName = provinces.find((p) => p._id === v.address?.provinceId)?.name || lbls.provinceName || '';
     const payload = {
@@ -245,18 +258,45 @@ const CreateAttraction = () => {
     return (json.text as string) || '';
   }
 
-  // ---------------- submit ----------------
+  /* ---------- Submit ---------- */
   const handleSubmit = async (values: FormType) => {
+    if (values.isFree) {
+      values.minPrice = 0;
+      values.maxPrice = 0;
+    }
     values.createdBy = user?._id;
-    const response = await HandleCreateAttraction(values);
-    if (response) {
-      toast.success('Tạo thành công');
-      form.reset();
+
+    const payload = {
+      ...values,
+      openTime: values.openTime?.trim() ? values.openTime : undefined,
+      closeTime: values.closeTime?.trim() ? values.closeTime : undefined,
+    };
+
+    const ok = await HandleCreateAttraction(payload as any);
+    if (ok) {
+      toast.success('Tạo thành công');
+      form.reset({
+        name: '',
+        image: '',
+        list_image: [],
+        description: '',
+        categoryId: '',
+        typeId: '',
+        address: { provinceId: form.getValues('address.provinceId') || '', districtId: '', wardId: '', detail: '' },
+        status: STATUS.ACTIVE,
+        isFree: false,
+        minPrice: 0,
+        maxPrice: 0,
+        openTime: '',
+        closeTime: '',
+        createdBy: user?._id,
+      });
+      setFree(false);
     }
   };
-  const handleError = (errors: any) => console.log(errors);
+  const handleError = (e: any) => console.log(e);
 
-  // ---------------- UI ----------------
+  /* ---------- UI ---------- */
   return (
     <Card className="max-w-6xl mx-auto mt-6 px-2 sm:px-6 md:px-10">
       <CardHeader>
@@ -266,12 +306,15 @@ const CreateAttraction = () => {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit, handleError)} className="space-y-8">
-            {/* ========== Thông tin cơ bản ========== */}
+            {/* 1) Thông tin cơ bản */}
             <section className="space-y-4">
-              <h3 className="text-base font-semibold">1) Thông tin cơ bản</h3>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">1</span>
+                <h3 className="text-base font-semibold">Thông tin cơ bản</h3>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <InputForm control={form.control} name="name" label="Tên địa điểm" />
+                  <InputForm control={form.control} name="name" label="Tên địa điểm" placeholder="Ví dụ: Chùa Hương Tích" />
                 </div>
                 <InputSelectCategory
                   control={form.control}
@@ -279,20 +322,17 @@ const CreateAttraction = () => {
                   label="Danh mục"
                   placeholder="Chọn danh mục"
                   allowedSlugs={['dia-diem-tham-quan']}
-                  // onLabelChange={(label: string) => setLabels((s) => ({ ...s, categoryName: label }))}
                 />
-                <InputSelectedType
-                  control={form.control}
-                  name="typeId"
-                  label="Loại hình du lịch"
-                  // onLabelChange={(label: string) => setLabels((s) => ({ ...s, typeName: label }))}
-                />
+                <InputSelectedType control={form.control} name="typeId" label="Loại hình du lịch" />
               </div>
             </section>
 
-            {/* ========== Hình ảnh (người dùng upload – không dùng cho AI) ========== */}
+            {/* 2) Hình ảnh */}
             <section className="space-y-4">
-              <h3 className="text-base font-semibold">2) Hình ảnh</h3>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">2</span>
+                <h3 className="text-base font-semibold">Hình ảnh</h3>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label className="block mb-2">Hình ảnh đại diện</Label>
@@ -305,11 +345,15 @@ const CreateAttraction = () => {
               </div>
             </section>
 
-            {/* ========== Giá & Trạng thái ========== */}
+            {/* 3) Giá & Trạng thái */}
             <section className="space-y-4">
-              <h3 className="text-base font-semibold">3) Giá & Trạng thái</h3>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">3</span>
+                <h3 className="text-base font-semibold">Giá & Trạng thái</h3>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label className="block mb-2">Miễn phí</Label>
                     <RadioGroup
@@ -318,10 +362,10 @@ const CreateAttraction = () => {
                       onValueChange={(value) => {
                         const isFreeValue = value === 'true';
                         setFree(isFreeValue);
-                        form.setValue('isFree', isFreeValue);
+                        form.setValue('isFree', isFreeValue, { shouldDirty: true, shouldValidate: true });
                         if (isFreeValue) {
-                          form.setValue('minPrice', 0);
-                          form.setValue('maxPrice', 0);
+                          form.setValue('minPrice', 0, { shouldDirty: true, shouldValidate: true });
+                          form.setValue('maxPrice', 0, { shouldDirty: true, shouldValidate: true });
                         }
                       }}
                     >
@@ -345,7 +389,9 @@ const CreateAttraction = () => {
                   <RadioGroup
                     defaultValue={STATUS.ACTIVE}
                     className="grid grid-cols-1 sm:grid-cols-3 gap-3"
-                    onValueChange={(value) => form.setValue('status', value)}
+                    onValueChange={(value) =>
+                      form.setValue('status', value as any, { shouldDirty: true, shouldValidate: true })
+                    }
                   >
                     {listStatus.map((item) => (
                       <label className="inline-flex items-center gap-2" key={item.value}>
@@ -358,9 +404,53 @@ const CreateAttraction = () => {
               </div>
             </section>
 
-            {/* ========== Địa chỉ ========== */}
+            {/* 4) Giờ hoạt động */}
             <section className="space-y-4">
-              <h3 className="text-base font-semibold">4) Địa chỉ</h3>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">4</span>
+                <h3 className="text-base font-semibold">Giờ hoạt động</h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Controller
+                  control={form.control}
+                  name="openTime"
+                  render={({ field, fieldState }) => (
+                    <div>
+                      <Label className="block mb-2">Giờ mở cửa (00:00–23:59)</Label>
+                      <TimeSelect value={field.value || ''} onChange={field.onChange} />
+                      <p className="text-xs text-muted-foreground mt-1">Để trống nếu không rõ.</p>
+                      {fieldState.error?.message ? (
+                        <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                      ) : null}
+                    </div>
+                  )}
+                />
+                <Controller
+                  control={form.control}
+                  name="closeTime"
+                  render={({ field, fieldState }) => (
+                    <div>
+                      <Label className="block mb-2">Giờ đóng cửa (00:00–23:59)</Label>
+                      <TimeSelect value={field.value || ''} onChange={field.onChange} />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Nếu hoạt động qua đêm, để trống để bỏ kiểm tra.
+                      </p>
+                      {fieldState.error?.message ? (
+                        <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                      ) : null}
+                    </div>
+                  )}
+                />
+              </div>
+            </section>
+
+            {/* 5) Địa chỉ */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">5</span>
+                <h3 className="text-base font-semibold">Địa chỉ</h3>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <Label className="block mb-2">Tỉnh</Label>
@@ -369,27 +459,19 @@ const CreateAttraction = () => {
                     value={provinces.find((p) => p._id === form.watch('address.provinceId'))?.name || ''}
                   />
                 </div>
-                <InputSelectDistrict
-                  control={form.control}
-                  name="address.districtId"
-                  label="Huyện"
-                  // onLabelChange={(label: string) => setLabels((s) => ({ ...s, districtName: label }))}
-                />
-                <InputSelectWard
-                  control={form.control}
-                  name="address.wardId"
-                  label="Xã/Phường"
-                  districtId={districtId}
-                  // onLabelChange={(label: string) => setLabels((s) => ({ ...s, wardName: label }))}
-                />
+                <InputSelectDistrict control={form.control} name="address.districtId" label="Huyện" />
+                <InputSelectWard control={form.control} name="address.wardId" label="Xã/Phường" districtId={districtId} />
                 <InputForm control={form.control} name="address.detail" label="Địa chỉ chi tiết" placeholder="VD: Thôn 3, xã ABC" />
               </div>
             </section>
 
-            {/* ========== Mô tả ========== */}
+            {/* 6) Mô tả */}
             <section className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold">5) Mô tả chi tiết</h3>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">6</span>
+                  <h3 className="text-base font-semibold">Mô tả chi tiết</h3>
+                </div>
                 <button
                   type="button"
                   disabled={aiLoading}
@@ -402,25 +484,9 @@ const CreateAttraction = () => {
                         toast.error('Vui lòng nhập Tên địa điểm trước khi dùng AI');
                         return;
                       }
-
-                      // (1) Viết mô tả bám form (HTML)
                       const aiHtml = await generateAiDescriptionStrict(v, labels);
-
-                      // (2) Tìm ảnh web theo ngữ cảnh
-                      const provinceName =
-                        provinces.find((p) => p._id === v.address?.provinceId)?.name ||
-                        labels.provinceName ||
-                        '';
-                      const query = [v.name, labels.typeName, labels.categoryName, provinceName, labels.districtName, labels.wardName]
-                        .filter(Boolean)
-                        .join(' ');
-                      const photos = await searchPhotos(query, 4);
-
-                      // (3) Chèn ảnh vào từng mục trong content
-                      const finalHtml = photos.length ? injectImagesIntoHtml(aiHtml, photos) : aiHtml;
-
-                      form.setValue('description', finalHtml, { shouldValidate: true, shouldDirty: true });
-                      toast.success('Đã sinh mô tả & chèn ảnh vào từng mục');
+                      form.setValue('description', aiHtml, { shouldValidate: true, shouldDirty: true });
+                      toast.success('Đã sinh mô tả chi tiết');
                     } catch (err: any) {
                       toast.error(err?.message || 'Tạo nội dung AI thất bại');
                     } finally {
@@ -450,7 +516,7 @@ const CreateAttraction = () => {
               />
             </section>
 
-            {/* ========== Submit ========== */}
+            {/* Submit */}
             <div className="pt-2 border-t">
               <div className="text-center">
                 <ButtonSubmit isLoading={form.formState.isSubmitting} text="Tạo địa điểm" />
