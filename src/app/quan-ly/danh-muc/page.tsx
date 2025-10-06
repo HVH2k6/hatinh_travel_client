@@ -1,5 +1,4 @@
-import AttractionsTable from '@/model/attraction/AttractionsTable';
-import { getAttractions } from '@/model/attraction/pagination';
+
 import CategoryTable from '@/model/category/CategoryTable';
 import { getCategories } from '@/model/category/pagination';
 import { pagination } from '@/util/constant';

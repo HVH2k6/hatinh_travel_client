@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,27 +15,36 @@ import ButtonSubmit from '@/components/button/ButtonSubmit';
 import { InputForm } from '@/components/input/InputForm';
 import { ICategory } from '@/interfaces/ICategory';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HandleCreateCategory } from '@/action/HandleCategory';
+import { HandleUpdateCategory } from '@/action/HandleCategory';
 
 const NONE_VALUE = '__none__';
 
 const schema = z.object({
   name: z.string().min(2, 'Tên danh mục tối thiểu 2 ký tự'),
   description: z.string().optional(),
-  parentId: z.string().nullable().optional(), // null = không có cha
+  parentId: z.string().nullable().optional(),
 });
 type FormType = z.infer<typeof schema>;
 
-export default function CreateCategory() {
+type Props = {
+  data: ICategory; // nhận trực tiếp từ server
+};
+
+export default function UpdateCategory({ data }: Props) {
   const router = useRouter();
   const [parents, setParents] = useState<ICategory[]>([]);
-  const [loadingParents, setLoadingParents] = useState<boolean>(true);
+  const [loadingParents, setLoadingParents] = useState(true);
 
   const form = useForm<FormType>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', description: '', parentId: null },
+    defaultValues: {
+      name: data.name || '',
+      description: data.description || '',
+      parentId: (data as any)?.parentId ?? null,
+    },
   });
 
+  // load parents
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -53,34 +62,34 @@ export default function CreateCategory() {
     return () => { cancelled = true; };
   }, []);
 
+  const parentOptions = useMemo(() => {
+    return parents.filter((p) => p._id !== data._id);
+  }, [parents, data._id]);
+
   const onSubmit = async (values: FormType) => {
-    console.log("🚀 ~ onSubmit ~ values:", values)
     try {
-      // await createCategory({ ...values, parentId: values.parentId || null });
-      await HandleCreateCategory(values)
-      toast.success('Tạo danh mục thành công');
+      await HandleUpdateCategory(values, data._id);
+      toast.success('Cập nhật danh mục thành công');
       router.push('/quan-ly/danh-muc');
       router.refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Tạo danh mục thất bại');
+      toast.error(e?.message || 'Cập nhật danh mục thất bại');
     }
   };
 
   return (
     <Card className="max-w-3xl mx-auto mt-6">
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Tạo danh mục</CardTitle>
+        <CardTitle className="text-2xl text-center">Cập nhật danh mục</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <InputForm control={form.control} name="name" label="Tên danh mục" placeholder="Ví dụ: Địa điểm tham quan" />
-
             <InputForm control={form.control} name="description" label="Mô tả (tuỳ chọn)" placeholder="Mô tả ngắn…" />
 
             <div>
               <Label className="mb-2 block">Danh mục cha (tuỳ chọn)</Label>
-
               {loadingParents ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
@@ -89,7 +98,6 @@ export default function CreateCategory() {
                   name="parentId"
                   render={({ field }) => (
                     <Select
-                      // Khi null -> undefined để hiện placeholder. KHÔNG dùng ''.
                       value={field.value ?? undefined}
                       onValueChange={(v) => field.onChange(v === NONE_VALUE ? null : v)}
                     >
@@ -97,9 +105,8 @@ export default function CreateCategory() {
                         <SelectValue placeholder="— Không chọn —" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Sentinel thay cho value rỗng */}
                         <SelectItem value={NONE_VALUE}>— Không chọn —</SelectItem>
-                        {parents.map((c) => (
+                        {parentOptions.map((c) => (
                           <SelectItem key={c._id} value={c._id}>
                             {c.name}
                           </SelectItem>
@@ -112,7 +119,7 @@ export default function CreateCategory() {
             </div>
 
             <div className="text-center">
-              <ButtonSubmit isLoading={form.formState.isSubmitting} text="Tạo danh mục" />
+              <ButtonSubmit isLoading={form.formState.isSubmitting} text="Lưu thay đổi" />
             </div>
           </form>
         </Form>

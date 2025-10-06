@@ -4,5 +4,6 @@ export interface ICategory {
     slug: string;
     createdAt: Date;
     updatedAt: Date;
+    description: string;
     parentId: string | null;
 }

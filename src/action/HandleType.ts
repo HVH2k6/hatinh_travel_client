@@ -1,9 +1,9 @@
 "use server"
 import { revalidateTag } from 'next/cache';
 
-export const HandleCreateCategory  = async (data: any) => {
+export const HandleCreateType  = async (data: any) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category/create`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/type/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -15,23 +15,23 @@ export const HandleCreateCategory  = async (data: any) => {
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to create attraction ');
+      throw new Error(errorData?.message || 'Failed to create  ');
     }
 
     const result = await res.json();
 
     // Chỉ revalidate nếu tạo thành công
-    revalidateTag('category');
+    revalidateTag('type');
     return result;
   } catch (error) {
-    console.error('🚨 Error creating attraction :', error);
+    console.error('🚨 Error creating  :', error);
     throw error;
   }
   
 };
-export const HandleUpdateCategory  = async (data: any, id: string) => {
+export const HandleUpdateType  = async (data: any, id: string) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category/update/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/type/update/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -43,22 +43,22 @@ export const HandleUpdateCategory  = async (data: any, id: string) => {
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to update attraction ');
+      throw new Error(errorData?.message || 'Failed to update  ');
     }
 
     const result = await res.json();
 
     // Chỉ revalidate nếu tạo thông báo
-    revalidateTag('category');
+    revalidateTag('type');
     return result;
   } catch (error) {
-    console.error('🚨 Error updating attraction :', error);
+    console.error('🚨 Error updating  :', error);
     throw error;
   }
 };
-export const HandleDeleteAttraction  = async (id: string) => {
+export const HandleDeleteType  = async (id: string) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/attractions/delete/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/type/delete/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -69,16 +69,16 @@ export const HandleDeleteAttraction  = async (id: string) => {
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to delete attraction ');
+      throw new Error(errorData?.message || 'Failed to delete  ');
     }
 
     const result = await res.json();
 
     // Chỉ revalidate nếu tạo thông báo
-    revalidateTag('attraction');
+    revalidateTag('type');
     return result;
   } catch (error) {
-    console.error('🚨 Error deleting attraction :', error);
+    console.error('🚨 Error deleting  :', error);
     throw error;
   }
 };

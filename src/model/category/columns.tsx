@@ -4,7 +4,6 @@ import * as React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { Pencil, Trash2, Loader2 } from "lucide-react";
-import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { ICategory } from "@/interfaces/ICategory";
 
@@ -12,7 +11,7 @@ function ActionsCell({ id }: { id: string }) {
   const [loading, setLoading] = React.useState(false);
 
   const onDelete = async () => {
-   
+    // TODO: Thêm logic xóa nếu cần
   };
 
   return (
@@ -37,7 +36,11 @@ function ActionsCell({ id }: { id: string }) {
         onClick={onDelete}
         disabled={loading}
       >
-        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Trash2 className="w-4 h-4" />
+        )}
       </Button>
     </div>
   );
@@ -50,7 +53,9 @@ export const columns: ColumnDef<ICategory & { parentName?: string }>[] = [
   {
     accessorKey: "name",
     header: "Tên danh mục",
-    cell: ({ row }) => <div className="font-medium">{row.getValue("name") as string}</div>,
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("name") as string}</div>
+    ),
   },
   {
     accessorKey: "slug",
@@ -59,7 +64,9 @@ export const columns: ColumnDef<ICategory & { parentName?: string }>[] = [
   {
     accessorKey: "parentName",
     header: "Danh mục cha",
-    cell: ({ row }) => <span>{(row.getValue("parentName") as string) || "—"}</span>,
+    cell: ({ row }) => (
+      <span>{(row.getValue("parentName") as string) || "—"}</span>
+    ),
   },
   {
     accessorKey: "createdAt",

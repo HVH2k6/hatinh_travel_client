@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -6,7 +7,6 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  Row,
 } from "@tanstack/react-table";
 
 import {
@@ -24,44 +24,7 @@ interface DataTableProps<TData, TValue> {
   emptyText?: string;
 }
 
-// Hàm đệ quy để render các dòng có phân cấp
-const renderCategoryRows = <TData, TValue>(
-  rows: Row<TData>[],
-  parentId: string | null = null,
-  level: number = 0
-): React.ReactNode[] => {
-  const result: React.ReactNode[] = [];
-
-  rows
-    .filter((row) => {
-      const rowData = row.original as any;
-      return rowData.parentId === parentId;
-    })
-    .forEach((row) => {
-      result.push(
-        <TableRow key={row.id}>
-          {row.getVisibleCells().map((cell, index) => (
-            <TableCell
-              key={cell.id}
-              className="px-4 py-2 align-top"
-              style={{
-                paddingLeft: index === 0 ? `${level * 20}px` : undefined,
-              }}
-            >
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </TableCell>
-          ))}
-        </TableRow>
-      );
-
-      // Render con
-      result.push(...renderCategoryRows(rows, (row.original as any)._id, level + 1));
-    });
-
-  return result;
-};
-
-export function DataCategoryTable<TData, TValue>({
+export function TypeTable<TData, TValue>({
   columns,
   data,
   emptyText = "Không có dữ liệu.",
@@ -71,8 +34,6 @@ export function DataCategoryTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
-  const rows = table.getRowModel().rows;
 
   return (
     <div className="overflow-auto rounded-xl border border-border shadow-sm bg-card">
@@ -95,14 +56,19 @@ export function DataCategoryTable<TData, TValue>({
         </TableHeader>
 
         <TableBody>
-          {rows.length ? (
-            renderCategoryRows(rows)
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="hover:bg-accent/40 transition-colors">
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="px-4 py-2 align-top">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
+              <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
                 {emptyText}
               </TableCell>
             </TableRow>

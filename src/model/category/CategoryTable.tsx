@@ -3,30 +3,43 @@
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { DataAttractionTable } from "./data-table";
+
 import { columns } from "./columns";
 import type { ICategory } from "@/interfaces/ICategory";
+import { DataCategoryTable } from "./data-table";
 
 type Props = {
-  data: ICategory[];
+  data: ICategory[]; // Dữ liệu từ API
   hasToolbar?: boolean;
 };
 
 export default function CategoryTable({ data, hasToolbar = true }: Props) {
   const [q, setQ] = React.useState("");
 
+  // ✅ Thêm parentName vào từng danh mục
+  const categoriesWithParentName = React.useMemo(() => {
+    return data.map((item) => {
+      const parent = data.find((p) => p._id === item.parentId);
+      return {
+        ...item,
+        parentName: parent?.name || undefined,
+      };
+    });
+  }, [data]);
+
+  // ✅ Lọc theo từ khoá
   const filtered = React.useMemo(() => {
     const text = q.trim().toLowerCase();
-    return data.filter((d) => {
-      const parentMatch = (d as any).parentName?.toLowerCase?.().includes(text);
+    return categoriesWithParentName.filter((d) => {
+      const parentMatch = d.parentName?.toLowerCase().includes(text);
       return (
         !text ||
         d.name.toLowerCase().includes(text) ||
-        d.slug?.toLowerCase?.().includes(text) ||
+        d.slug?.toLowerCase().includes(text) ||
         parentMatch
       );
     });
-  }, [data, q]);
+  }, [categoriesWithParentName, q]);
 
   return (
     <Card className="border shadow-sm">
@@ -44,7 +57,7 @@ export default function CategoryTable({ data, hasToolbar = true }: Props) {
       </CardHeader>
 
       <CardContent>
-        <DataAttractionTable columns={columns} data={filtered} />
+        <DataCategoryTable columns={columns} data={filtered} />
       </CardContent>
     </Card>
   );
