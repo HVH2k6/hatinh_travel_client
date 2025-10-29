@@ -10,12 +10,19 @@ import { toast } from 'react-toastify';
 import { Form } from '@/components/ui/form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 import { InputForm } from '@/components/input/InputForm';
 import { ICategory } from '@/interfaces/ICategory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HandleUpdateCategory } from '@/action/HandleCategory';
+import { InputSelectCategory } from '@/components/input/InputSelectCategory';
 
 const NONE_VALUE = '__none__';
 
@@ -49,7 +56,10 @@ export default function UpdateCategory({ data }: Props) {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category?limit=1000`, { cache: 'no-store' });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/category?limit=1000`,
+          { cache: 'no-store' }
+        );
         if (!res.ok) throw new Error('Không tải được danh mục cha');
         const json = await res.json();
         if (!cancelled) setParents(json?.data || []);
@@ -59,7 +69,9 @@ export default function UpdateCategory({ data }: Props) {
         if (!cancelled) setLoadingParents(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const parentOptions = useMemo(() => {
@@ -78,48 +90,47 @@ export default function UpdateCategory({ data }: Props) {
   };
 
   return (
-    <Card className="max-w-3xl mx-auto mt-6">
+    <Card className='max-w-3xl mx-auto mt-6'>
       <CardHeader>
-        <CardTitle className="text-2xl text-center">Cập nhật danh mục</CardTitle>
+        <CardTitle className='text-2xl text-center'>
+          Cập nhật danh mục
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <InputForm control={form.control} name="name" label="Tên danh mục" placeholder="Ví dụ: Địa điểm tham quan" />
-            <InputForm control={form.control} name="description" label="Mô tả (tuỳ chọn)" placeholder="Mô tả ngắn…" />
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <InputForm
+              control={form.control}
+              name='name'
+              label='Tên danh mục'
+              placeholder='Ví dụ: Địa điểm tham quan'
+            />
+            <InputForm
+              control={form.control}
+              name='description'
+              label='Mô tả (tuỳ chọn)'
+              placeholder='Mô tả ngắn…'
+            />
 
             <div>
-              <Label className="mb-2 block">Danh mục cha (tuỳ chọn)</Label>
+              <Label className='mb-2 block'>Danh mục cha (tuỳ chọn)</Label>
               {loadingParents ? (
-                <Skeleton className="h-10 w-full" />
+                <Skeleton className='h-10 w-full' />
               ) : (
-                <Controller
+                <InputSelectCategory
                   control={form.control}
-                  name="parentId"
-                  render={({ field }) => (
-                    <Select
-                      value={field.value ?? undefined}
-                      onValueChange={(v) => field.onChange(v === NONE_VALUE ? null : v)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="— Không chọn —" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={NONE_VALUE}>— Không chọn —</SelectItem>
-                        {parentOptions.map((c) => (
-                          <SelectItem key={c._id} value={c._id}>
-                            {c.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  name='parentId'
+                  
+                  placeholder='Ví dụ: Địa điểm tham quan'
                 />
               )}
             </div>
 
-            <div className="text-center">
-              <ButtonSubmit isLoading={form.formState.isSubmitting} text="Lưu thay đổi" />
+            <div className='text-center'>
+              <ButtonSubmit
+                isLoading={form.formState.isSubmitting}
+                text='Lưu thay đổi'
+              />
             </div>
           </form>
         </Form>

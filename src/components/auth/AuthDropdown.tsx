@@ -35,6 +35,11 @@ export function AuthDropdown({ auth }: { auth: IUser }) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" sideOffset={6} className="w-48">
+         {auth?.roleId?.name === 'User' && (
+          <DropdownMenuItem asChild>
+            <Link href="/dang-ky-ban-hang">Đăng ký bán hàng</Link>
+          </DropdownMenuItem>
+        )}
         {auth?.roleId?.name === 'Admin' && (
           <DropdownMenuItem asChild>
             <Link href="/quan-ly/tong-quan">Quản lý</Link>
