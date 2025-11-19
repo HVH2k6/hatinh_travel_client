@@ -18,13 +18,16 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
+import Cookies from 'js-cookie'; // 👈 IMPORT THƯ VIỆN ĐỌC COOKIE
 import type { ISellerApplication } from "@/interfaces/ISellerApplication";
+// LOẠI BỎ: import { cookies } from 'next/headers'
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 const fmt = (d?: string | Date) => (d ? new Date(d).toLocaleString("vi-VN") : "—");
 
 function StatusBadge({ status }: { status: ISellerApplication["status"] }) {
+// ... (StatusBadge logic remains the same)
   const map: Record<
     ISellerApplication["status"],
     { label: string; variant?: "default" | "secondary" | "destructive" | "outline" }
@@ -48,12 +51,28 @@ function ActionsCell({ app }: { app: ISellerApplication }) {
   const [reason, setReason] = React.useState("");
   const [loading, setLoading] = React.useState<"approve" | "reject" | null>(null);
 
+  // Hàm lấy token từ Cookie
+  const getAuthToken = () => {
+    // Tên cookie thường là 'access_token' hoặc 'token', bạn hãy thay thế cho đúng
+    const token = Cookies.get('access_token'); 
+    if (!token) {
+        toast.error("Không tìm thấy token. Vui lòng đăng nhập lại.");
+    }
+    return token;
+  };
+
   const approve = async () => {
     try {
       setLoading("approve");
+      const token = getAuthToken(); // 👈 LẤY TOKEN TỪ COOKIE
+      if (!token) return;
+
       const res = await fetch(`${API}/sellerapplication/seller-applications/${id}/approve`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // SỬ DỤNG TOKEN
+        },
         cache: "no-store",
       });
       const json = await res.json().catch(() => ({}));
@@ -72,9 +91,15 @@ function ActionsCell({ app }: { app: ISellerApplication }) {
   const reject = async () => {
     try {
       setLoading("reject");
+      const token = getAuthToken(); // 👈 LẤY TOKEN TỪ COOKIE
+      if (!token) return;
+
       const res = await fetch(`${API}/sellerapplication/seller-applications/${id}/reject`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // SỬ DỤNG TOKEN
+        },
         body: JSON.stringify({ reason }),
         cache: "no-store",
       });
@@ -94,7 +119,7 @@ function ActionsCell({ app }: { app: ISellerApplication }) {
   };
 
   const disabled = app.status !== "pending";
-
+// ... (JSX render remains the same)
   return (
     <div className="flex gap-2">
       {/* Xem chi tiết */}
@@ -106,7 +131,7 @@ function ActionsCell({ app }: { app: ISellerApplication }) {
         aria-label="Xem chi tiết"
         title="Xem chi tiết hồ sơ"
       >
-        <Link href={`/quan-ly/yeu-cau-shop/${id}`}>
+        <Link href={`/quan-ly/shop/duyet-don/xem/${id}`}>
           <Eye className="w-4 h-4" />
         </Link>
       </Button>
@@ -188,6 +213,7 @@ function ActionsCell({ app }: { app: ISellerApplication }) {
 }
 
 export const columns: ColumnDef<ISellerApplication>[] = [
+// ... (columns definition remains the same)
   {
     id: "user",
     header: "Người nộp",

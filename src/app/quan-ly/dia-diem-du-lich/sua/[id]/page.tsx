@@ -3,14 +3,14 @@ import UpdateAttraction from '@/model/attraction/UpdateAttraction';
 import type { Metadata } from 'next';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-// ✅ Dynamic metadata theo params
+// ✅ Dynamic metadata với params được await
 export async function generateMetadata(
   { params }: PageProps
 ): Promise<Metadata> {
-  const { id } = params;
+  const { id } = await params; // ← Await params trước khi destructure
 
   try {
     const res = await fetch(
@@ -40,7 +40,7 @@ export async function generateMetadata(
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = params;
+  const { id } = await params; // ← Await params trước khi destructure
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/attractions/update-detail/${id}`,
@@ -56,5 +56,7 @@ export default async function Page({ params }: PageProps) {
     return <div>Không có dữ liệu</div>;
   }
 
-  return <UpdateAttraction data={data} />;
+  return <>
+  <UpdateAttraction data={data} />
+  </>
 }

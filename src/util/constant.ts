@@ -37,6 +37,7 @@ export const menuSidebarAdmin = [
     title: 'Địa điểm du lịch',
     url: '#',
     icon: Map,
+    page: 'admin',
 
     items: [
       {
@@ -53,6 +54,7 @@ export const menuSidebarAdmin = [
     title: 'Danh mục',
     url: '#',
     icon: SquareMenu,
+    page: 'admin',
 
     items: [
       {
@@ -69,6 +71,7 @@ export const menuSidebarAdmin = [
     title: 'Loại hình',
     url: '#',
     icon: FileType,
+    page: 'admin',
 
     items: [
       {
@@ -85,16 +88,28 @@ export const menuSidebarAdmin = [
     title: 'Chợ',
     url: '#',
     icon: ShoppingBag,
+    page: 'admin',
 
     items: [
       {
         title: 'Danh sách chợ',
-        url: '/quan-ly/cho',
+        url: '/quan-ly/shop',
+      },
+      {
+        title: 'Duyệt đơn mở shop',
+        url: '/quan-ly/shop/duyet-don',
       },
       {
         title: 'Tạo mới chợ',
-        url: '/quan-ly/cho/tao-moi',
+        url: '/quan-ly/shop/tao-moi',
       },
     ],
   },
-];
+    {
+    title: 'Danh sách cửa hàng',
+    url: '/quan-ly-cua-hang',
+    icon: ShoppingBag,
+    page: 'shop',
+
+  },
+] as const; // 👈 Dòng này là chìa khóa để giải quyết lỗi

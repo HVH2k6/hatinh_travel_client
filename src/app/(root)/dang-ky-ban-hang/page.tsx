@@ -1,4 +1,4 @@
-import RegisterShop from "@/model/shop/RegisterShop";
+import RegisterShop from "@/model/shopRegister/RegisterShop";
 
 export default function page() {
     return (

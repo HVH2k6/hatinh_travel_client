@@ -15,7 +15,7 @@ export const HandleCreateCategory  = async (data: any) => {
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to create attraction ');
+      throw new Error(errorData?.message || 'Failed to create category ');
     }
 
     const result = await res.json();
@@ -24,7 +24,7 @@ export const HandleCreateCategory  = async (data: any) => {
     revalidateTag('category');
     return result;
   } catch (error) {
-    console.error('🚨 Error creating attraction :', error);
+    console.error('🚨 Error creating category :', error);
     throw error;
   }
   
@@ -43,7 +43,7 @@ export const HandleUpdateCategory  = async (data: any, id: string) => {
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to update attraction ');
+      throw new Error(errorData?.message || 'Failed to update category ');
     }
 
     const result = await res.json();
@@ -52,13 +52,13 @@ export const HandleUpdateCategory  = async (data: any, id: string) => {
     revalidateTag('category');
     return result;
   } catch (error) {
-    console.error('🚨 Error updating attraction :', error);
+    console.error('🚨 Error updating category :', error);
     throw error;
   }
 };
-export const HandleDeleteAttraction  = async (id: string) => {
+export const HandleDeleteCategory  = async (id: string) => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/attractions/delete/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/category/delete/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -69,16 +69,16 @@ export const HandleDeleteAttraction  = async (id: string) => {
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to delete attraction ');
+      throw new Error(errorData?.message || 'Failed to delete category ');
     }
 
     const result = await res.json();
 
     // Chỉ revalidate nếu tạo thông báo
-    revalidateTag('attraction');
+    revalidateTag('category');
     return result;
   } catch (error) {
-    console.error('🚨 Error deleting attraction :', error);
+    console.error('🚨 Error deleting category :', error);
     throw error;
   }
 };

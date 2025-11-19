@@ -22,7 +22,7 @@ export interface IShop {
   };
 
   contact?: {
-    phone?: string;
+    phone: string;
     facebook?: string;
     zalo?: string;
   };
@@ -31,6 +31,7 @@ export interface IShop {
   ratingCount?: number;
 
   status?: "pending" | "active" | "suspended";
+  documents?: string[];
   isDeleted?: boolean;
 
   createdAt?: string | Date;

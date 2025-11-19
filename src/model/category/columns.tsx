@@ -6,14 +6,29 @@ import Link from "next/link";
 import { Pencil, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ICategory } from "@/interfaces/ICategory";
+import { HandleDeleteCategory } from "@/action/HandleCategory";
+import { toast } from "react-toastify";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 function ActionsCell({ id }: { id: string }) {
   const [loading, setLoading] = React.useState(false);
 
   const onDelete = async () => {
-    // TODO: Thêm logic xóa nếu cần
-  };
-
+     setLoading(true);
+     try {
+       await HandleDeleteCategory(id);
+       toast.success("Xoá thành công");
+     } catch (err: any) {
+       toast.error(
+         err?.message ||
+           err?.response?.data?.message ||
+           "Có lỗi xảy ra khi xoá. Vui lòng thử lại."
+       );
+     } finally {
+       setLoading(false);
+     }
+   };
+ 
   return (
     <div className="flex gap-2">
       <Button
@@ -28,20 +43,37 @@ function ActionsCell({ id }: { id: string }) {
         </Link>
       </Button>
 
-      <Button
-        variant="outline"
-        size="icon"
-        className="text-red-600 hover:text-red-800 border-red-200"
-        aria-label="Xoá danh mục"
-        onClick={onDelete}
-        disabled={loading}
-      >
-        {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Trash2 className="w-4 h-4" />
-        )}
-      </Button>
+     <AlertDialog>
+           <AlertDialogTrigger asChild>
+             <Button
+               variant="outline"
+               size="icon"
+               className="text-red-600 hover:text-red-800 border-red-200"
+               aria-label="Xoá danh mục"
+               disabled={loading}
+             >
+               {loading ? (
+                 <Loader2 className="w-4 h-4 animate-spin" />
+               ) : (
+                 <Trash2 className="w-4 h-4" />
+               )}
+             </Button>
+           </AlertDialogTrigger>
+           <AlertDialogContent>
+             <AlertDialogHeader>
+               <AlertDialogTitle>Xác nhận xoá</AlertDialogTitle>
+               <AlertDialogDescription>
+                 Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá danh mục này?
+               </AlertDialogDescription>
+             </AlertDialogHeader>
+             <AlertDialogFooter>
+               <AlertDialogCancel>Huỷ</AlertDialogCancel>
+               <AlertDialogAction onClick={onDelete} className="bg-red-600 hover:bg-red-700">
+                 Xoá
+               </AlertDialogAction>
+             </AlertDialogFooter>
+           </AlertDialogContent>
+         </AlertDialog>
     </div>
   );
 }
