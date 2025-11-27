@@ -1,0 +1,42 @@
+  {
+            "address": {
+                "provinceId": {
+                    "_id": "686e1c22c304e4bcdaa0e08c",
+                    "name": "Tỉnh Hà Tĩnh",
+                    "codename": "tinh_ha_tinh"
+                },
+                "districtId": {
+                    "_id": "686245a5c22f153c83d1dc9e",
+                    "name": "Huyện Cẩm Xuyên",
+                    "codename": "huyen_cam_xuyen"
+                },
+                "wardId": {
+                    "_id": "686245a5c22f153c83d1dca8",
+                    "name": "Xã Nam Phúc Thăng",
+                    "codename": "xa_nam_phuc_thang"
+                },
+                "detail": ""
+            },
+            "contact": {
+                "facebook": "fb.com",
+                "zalo": "",
+                "phone": "0987654323"
+            },
+            "_id": "6915bafbf88d33f2f9e14e2c",
+            "name": "Shop 2221",
+            "categoryId": {
+                "_id": "68f2c2a2a02c401e850496c8",
+                "name": "Đặc sản núi rừng",
+                "slug": "dac-san-nui-rung"
+            },
+            "sellerId": {
+                "_id": "68668df450ee927533269f01",
+                "username": "hưngde3",
+                "email": "u@gmail.com"
+            },
+            "image": "https://res.cloudinary.com/dceqnckf1/image/upload/v1763031606/gmlhz2szgpmbhlyoj3pt.png",
+            "status": "ACTIVE",
+            "createdAt": "2025-11-13T11:03:23.274Z",
+            "updatedAt": "2025-11-18T15:20:48.058Z",
+            "__v": 0
+        }

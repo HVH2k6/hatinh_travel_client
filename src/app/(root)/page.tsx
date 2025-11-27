@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import Script from 'next/script'
 import AttractionList from '@/components/attraction/AttractionList'
 import BannerAttraction from '@/components/attraction/Banner'
+import CardSgop from '@/components/shop/Card'
+import CardShop from '@/components/shop/Card'
 
 // --- TỐI ƯU HÓA CHO HÀ TĨNH ---
 const SITE_NAME = 'Cẩm Nang Du Lịch Hà Tĩnh'
@@ -107,6 +109,7 @@ export default async function Home() {
         <div className="mt-10">
           <h1 className="text-3xl font-bold mb-6">Các Địa Điểm Nổi Bật tại Hà Tĩnh</h1>
           <AttractionList data={data.data || []} />
+          {/* <CardShop  /> */}
         </div>
       </div>
     </>

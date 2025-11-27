@@ -5,5 +5,6 @@
 4.Hoàn thành chi ui
 5.Gợi ý du lich bằng AI
 6.Đánh giá shop, địa điểm du lịch
+đa ngôn ngữ
 7.Fix lỗi vặt
 8.deloy

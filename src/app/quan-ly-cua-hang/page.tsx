@@ -1,6 +1,17 @@
 import { cookies } from 'next/headers';
 import DetailShopMe from '@/model/shop/DetailShopMe';
+import { Metadata } from 'next';
 
+
+type PageParams = { id: string };
+type PageProps = { params: Promise<PageParams> }; 
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  return {
+    title: 'Quản lý cửa hàng',
+  };
+}
 export default async function page() {
   // Get the headers object from Next.js
   const cookieStore = cookies();

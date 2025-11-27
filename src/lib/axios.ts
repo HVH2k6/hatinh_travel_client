@@ -14,7 +14,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// Xử lý response lỗi: access_token hết hạn
+// ✅ Axios interceptor CHỈ renew token, KHÔNG redirect
 api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
@@ -25,7 +25,11 @@ api.interceptors.response.use(
 
       try {
         const refresh_token = getRefreshToken();
-        if (!refresh_token) throw new Error('Missing refresh token');
+        if (!refresh_token) {
+          clearTokens();
+          // ❌ KHÔNG redirect ở đây
+          return Promise.reject(new Error('Missing refresh token'));
+        }
 
         const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/renew-access-token`, {
           refresh_token,
@@ -34,15 +38,14 @@ api.interceptors.response.use(
         const { access_token: newAccessToken } = res.data;
         saveTokens(newAccessToken, refresh_token);
 
-        // ✅ Gắn vào toàn bộ axios mặc định
         api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
         originalConfig.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalConfig);
       } catch (err) {
         clearTokens();
-        // return Promise.reject(new Error('Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.'));
-        
+        // ❌ KHÔNG redirect ở đây
+        return Promise.reject(err);
       }
     }
 

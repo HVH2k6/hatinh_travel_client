@@ -1,4 +1,5 @@
 import { IShop } from './IShop';
+import { IUnit } from './IUnit';
 
 interface Shop {
   _id: IShop; // nếu có thể nhận _id thuần: IProvinces | string
@@ -10,12 +11,9 @@ export interface IProduct {
   slug: string;
   createdAt: Date;
   updatedAt: Date;
+  price: number;
+  unitId:IUnit
   description: string;
-  contact?: {
-    phone?: string;
-    facebook?: string;
-    zalo?: string;
-  };
   shopId: IShop;
   image?: string;
   list_image: string[];

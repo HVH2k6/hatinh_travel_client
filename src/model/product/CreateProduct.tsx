@@ -1,202 +1,219 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { 
+  LayoutGrid, 
+  Package, 
+  Image as ImageIcon, 
+  FileText, 
+  Save 
+} from 'lucide-react'; // Import thêm Icon cho đẹp
 
 import { Form } from '@/components/ui/form';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 
 import { InputForm } from '@/components/input/InputForm';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
-import { InputSelectWard } from '@/components/input/InputSelectWard';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
-
-import { getProvinces } from '@/util/constant';
-import { useCheckAuth } from '@/components/auth/checkauth';
-import { toast } from 'react-toastify';
-
-import { InputSelectCategory } from '@/components/input/InputSelectCategory';
-import { IShop } from '@/interfaces/IShop';
-import { HandleUpdateShop } from '@/action/HandleShop';
-import { useRouter } from 'next/navigation';
 import RichText from '@/components/editor/RichText';
 import { InputPrice } from '@/components/input/InputPrice';
+import { InputSelectedUnit } from '@/components/input/InputSelectedUnit';
 import { HandleCreateProduct } from '@/action/HandleProduct';
+import { IShop } from '@/interfaces/IShop';
 
-/* ============================ SCHEMA (chuẩn backend) ============================ */
+/* ============================ SCHEMA ============================ */
 const formSchema = z.object({
-  name: z.string().min(5, { message: 'Tên cửa hàng phải từ 5 ký tự trở lên.' }),
+  name: z.string().min(5, { message: 'Tên sản phẩm phải từ 5 ký tự trở lên.' }),
   shopId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
   image: z.string().url('Ảnh đại diện phải là URL hợp lệ.').optional(),
-  price: z
-    .number({
-      required_error: 'Vui lòng nhập giá .',
-      invalid_type_error: 'Giá  phải là số.',
-    })
-    .nonnegative({ message: 'Giá  không được âm.' }),
-  description: z
-    .string()
-    .min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
-  
-  list_image: z
-    .array(z.string().url('Mỗi tài liệu phải là URL hợp lệ.'))
-    .default([])
-    .optional(),
+  price: z.number({ required_error: 'Vui lòng nhập giá.' }).nonnegative({ message: 'Giá không được âm.' }),
+  description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
+  unitId: z.string().min(1, { message: 'Vui lòng chọn đơn vị tính.' }),
+  list_image: z.array(z.string().url()).default([]).optional(),
 });
 
 type FormType = z.infer<typeof formSchema>;
 
-const API = process.env.NEXT_PUBLIC_API_URL;
 type Props = {
-  data: IShop; // nhận trực tiếp từ server
+  data: IShop;
 };
 
 export default function CreateProduct({ data }: Props) {
-  // console.log(data)
-  const user = useCheckAuth();
-
-  const [provinces, setProvinces] = useState<any[]>([]);
-
+  const router = useRouter();
+  
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       shopId: data._id,
       description: '',
-
+      unitId: '',
       image: '',
       price: 0,
-     
       list_image: [],
     },
   });
 
-  const router = useRouter();
-
   const onSubmit = async (values: FormType) => {
     try {
-      const payload = { ...values };
-      await HandleCreateProduct(payload as any);
-
-      toast.success('Cập nhật thành công');
-
-      form.reset({
-        name: '',
-        shopId: '',
-        image: '',
-        price: 0,
-
-        description: '',
-        // contact: { phone: '', facebook: '', zalo: '' },
-        list_image: [],
-      });
-      router.push('/quan-ly-cua-hang');
-      //   console.log("values >>>>>>>", values);
+      await HandleCreateProduct(values as any);
+      toast.success('Tạo sản phẩm thành công');
+      form.reset();
+      router.push(`/quan-ly-cua-hang/danh-sach-san-pham/${data._id}`);
     } catch (err: any) {
-      const msg =
-        err?.message ||
-        err?.body?.message ||
-        err?.response?.data?.message ||
-        'Có lỗi xảy ra, vui lòng thử lại.';
-
+      const msg = err?.message || 'Có lỗi xảy ra, vui lòng thử lại.';
       toast.error(msg);
     }
   };
 
-  const onError = (e: any) => console.log(e);
-
   return (
-    <Card className='max-w-4xl mx-auto mt-6 px-2 sm:px-6 md:px-10'>
-      <CardHeader>
-        <CardTitle className='text-2xl text-center'>Caapj nh</CardTitle>
-      </CardHeader>
+    <div className="max-w-[1200px] mx-auto mt-6 mb-20 px-4">
+      {/* Header Page */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Thêm mới sản phẩm</h1>
+           <p className="text-sm text-muted-foreground">Tạo sản phẩm mới cho cửa hàng: <span className="font-semibold text-blue-600">{data.name}</span></p>
+        </div>
+      </div>
 
-      <CardContent>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit, onError)}
-            className='space-y-8'
-          >
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <InputForm
-                control={form.control}
-                name='name'
-                label='Tên sản phẩm'
-              />
-              <InputPrice control={form.control} name='price' label='Giá' />
-            </div>
-            {/* 1) Thông tin cơ bản */}
-            <section className='space-y-4'>
-              <div className='flex items-center gap-2'>
-                <span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm'>
-                  1
-                </span>
-                <h3 className='text-base font-semibold'>Thông tin cơ bản</h3>
-              </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+       
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* === CỘT TRÁI (CHIẾM 2 PHẦN) - THÔNG TIN CHÍNH === */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Block 1: Thông tin chung */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Package className="w-5 h-5 text-blue-500" />
+                    Thông tin chung
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <InputForm
+                    control={form.control}
+                    name="name"
+                    label="Tên sản phẩm"
+                    placeholder="Ví dụ: Khô mực loại 1, Nước mắm nhỉ..."
+                  />
+                  
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                       <FileText className="w-4 h-4" /> Mô tả chi tiết
+                    </Label>
+                    <Controller
+                      control={form.control}
+                      name="description"
+                      render={({ field, fieldState }) => (
+                        <div>
+                          <RichText
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="Mô tả đặc điểm, nguồn gốc, cách sử dụng..."
+                          />
+                          {fieldState.error && (
+                            <p className="text-sm text-red-500 mt-1">{fieldState.error.message}</p>
+                          )}
+                        </div>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <Label className='block mb-2'>Ảnh đại diện (URL)</Label>
-                  <InputUploadSingleFile control={form.control} name='image' />
-                </div>
-                <div>
-                  <Label className='block mb-2'>Ảnh mô tả thêm</Label>
+              {/* Block 2: Thư viện ảnh */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <LayoutGrid className="w-5 h-5 text-purple-500" />
+                    Thư viện ảnh
+                  </CardTitle>
+                  <CardDescription>Tải lên nhiều ảnh để khách hàng có cái nhìn chi tiết hơn.</CardDescription>
+                </CardHeader>
+                <CardContent>
                   <InputUploadMultipleFiles
                     control={form.control}
-                    name='list_image'
+                    name="list_image"
                   />
-                </div>
-              </div>
-            </section>
-
-            <section className='space-y-3'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <span className='inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm'>
-                    6
-                  </span>
-                  <h3 className='text-base font-semibold'>Mô tả chi tiết</h3>
-                </div>
-              </div>
-
-              <Controller
-                control={form.control}
-                name='description'
-                render={({ field, fieldState }) => (
-                  <div>
-                    <RichText
-                      value={field.value}
-                      onChange={(html) => field.onChange(html)}
-                      placeholder='Mô tả nổi bật, trải nghiệm, thời điểm lý tưởng, lưu ý…'
-                    />
-                    {fieldState.error?.message ? (
-                      <p className='text-sm text-red-500 mt-2'>
-                        {fieldState.error.message}
-                      </p>
-                    ) : null}
-                  </div>
-                )}
-              />
-            </section>
-
-            {/* Submit */}
-            <div className='pt-2 border-t'>
-              <div className='text-center'>
-                <ButtonSubmit
-                  isLoading={form.formState.isSubmitting}
-                  text={'Tạo sản phẩm'}
-                />
-              </div>
+                </CardContent>
+              </Card>
             </div>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+
+            {/* === CỘT PHẢI (CHIẾM 1 PHẦN) - CÀI ĐẶT & ẢNH ĐẠI DIỆN === */}
+            <div className="lg:col-span-1 space-y-6">
+              
+              {/* Block 3: Giá & Đơn vị */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Giá & Đơn vị</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <InputPrice 
+                    control={form.control} 
+                    name="price" 
+                    label="Giá bán (VNĐ)" 
+                  />
+                  
+                  <Separator />
+                  
+                  <InputSelectedUnit 
+                    control={form.control} 
+                    name="unitId" 
+                    // label="Đơn vị tính" (Giả sử component này có prop label)
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Block 4: Ảnh đại diện (Thumbnail) */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <ImageIcon className="w-5 h-5 text-orange-500" />
+                    Ảnh đại diện
+                  </CardTitle>
+                  <CardDescription>Hình ảnh hiển thị đầu tiên trên thẻ sản phẩm.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <InputUploadSingleFile 
+                    control={form.control} 
+                    name="image" 
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Nút Submit Mobile (Hiện khi màn hình nhỏ) */}
+              <div className="block md:hidden pt-4">
+                 <ButtonSubmit 
+                    isLoading={form.formState.isSubmitting} 
+                    text="Hoàn tất & Tạo sản phẩm"
+                    // className="w-full"
+                 />
+              </div>
+               <div className="hidden md:block">
+           {/* Nút submit phụ ở header cho tiện bấm */}
+           <ButtonSubmit 
+              isLoading={form.formState.isSubmitting} 
+              text="Lưu sản phẩm" 
+              // icon={<Save className="w-4 h-4 mr-2" />}
+              // onClick={form.handleSubmit(onSubmit)}
+           />
+        </div>
+
+            </div>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }

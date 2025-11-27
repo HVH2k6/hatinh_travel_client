@@ -74,3 +74,34 @@ export async function HandleUpdateShop(data: any, id: string) {
     throw err; // QUAN TRỌNG: giữ nguyên để client bắt được e.status
   }
 }
+export async function HandleDeleteShop(id: string) {
+  const cookieStore = cookies();
+  const accessToken = (await cookieStore).get('access_token')?.value;
+
+  try {
+    const baseURL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+    if (!baseURL) throw new Error('Missing API_URL');
+    const res = await fetch(`${baseURL}/shop/delete/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('❌ Server responded with error:', errorData);
+      throw new Error(errorData?.message || 'Failed to delete category ');
+    }
+
+    const result = await res.json();
+
+    // Chỉ revalidate nếu tạo thông báo
+    revalidateTag('shop');
+    return result;
+  } catch (err) {
+    console.error('🚨 HandleDeleteShop error:', err);
+    throw err; // QUAN TRỌNG: giữ nguyên để client bắt được e.status
+  }
+}

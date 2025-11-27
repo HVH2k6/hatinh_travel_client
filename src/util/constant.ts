@@ -1,6 +1,7 @@
 import {
   FileType,
   Map,
+  Scale,
   ShoppingBag,
   SquareMenu,
   SquareTerminal,
@@ -11,7 +12,11 @@ export const STATUS = {
   PENDING: 'pending',
   DELETED: 'deleted',
 };
-
+export const STATUS_SHOP = {
+  ACTIVE: 'ACTIVE',
+  PENDING: 'PENDING',
+  DELETED: 'DELETED',
+};
 export const getProvinces = async () => {
   try {
     const res = await fetch(
@@ -85,31 +90,53 @@ export const menuSidebarAdmin = [
     ],
   },
   {
-    title: 'Chợ',
+    title: 'Cửa hàng',
     url: '#',
     icon: ShoppingBag,
     page: 'admin',
 
     items: [
       {
-        title: 'Danh sách chợ',
-        url: '/quan-ly/shop',
+        title: 'Danh sách cửa hàng',
+        url: '/quan-ly/cua-hang',
       },
       {
-        title: 'Duyệt đơn mở shop',
-        url: '/quan-ly/shop/duyet-don',
+        title: 'Duyệt đơn mở cửa hàng',
+        url: '/quan-ly/cua-hang/duyet-don',
       },
       {
         title: 'Tạo mới chợ',
-        url: '/quan-ly/shop/tao-moi',
+        url: '/quan-ly/cua-hang/tao-moi',
       },
     ],
   },
-    {
-    title: 'Danh sách cửa hàng',
-    url: '/quan-ly-cua-hang',
+  {
+    title: 'Đơn vị tính',
+    url: '#',
+    icon: Scale, // Hoặc dùng Ruler (thước) / Container (thùng hàng)
+    page: 'admin',
+
+    items: [
+      {
+        title: 'Danh sách đơn vị',
+        url: '/quan-ly/don-vi-tinh',
+      },
+      {
+        title: 'Tạo mới đơn vị',
+        url: '/quan-ly/don-vi-tinh/tao-moi',
+      },
+    ],
+  },
+  {
+    title: 'Cửa hàng',
+    url: '#',
     icon: ShoppingBag,
     page: 'shop',
-
+    items: [
+      {
+        title: 'Danh sách cửa hàng',
+        url: '/quan-ly-cua-hang',
+      },
+    ],
   },
 ] as const; // 👈 Dòng này là chìa khóa để giải quyết lỗi

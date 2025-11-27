@@ -10,7 +10,7 @@ export async function getAttractions({ page = pagination.page, limit = paginatio
   if (!res.ok) throw new Error("Lỗi lấy dữ liệu")
 
   const json = await res.json()
-  console.log("🚀 ~ getAttractions ~ json:", json)
+  // console.log("🚀 ~ getAttractions ~ json:", json)
 
   return {
     data: mapRawDataToattraction(json.data),

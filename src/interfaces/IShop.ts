@@ -11,13 +11,13 @@ export interface IShop {
   image?: string;
   images?: string[];
 
-  categoryId: ICategory | string;
-  sellerId: IUser | string;
+  categoryId: ICategory ;
+  sellerId: IUser ;
 
   address: {
-    provinceId: IProvinces | string;
-    districtId: IDistricts | string;
-    wardId: IWards | string;
+    provinceId: IProvinces ;
+    districtId: IDistricts ;
+    wardId: IWards ;
     detail?: string;
   };
 

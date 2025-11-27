@@ -24,11 +24,13 @@ export default function DetailShopMe({ data }: Props) {
             <DropdownMenuItem>
                 <Link href={`/quan-ly-cua-hang/sua-cua-hang/${item._id}`}>Sửa cửa hàng</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>Xem đánh giá của khách</DropdownMenuItem>
-            <DropdownMenuItem>Xem toàn bộ sản phẩm</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/quan-ly-cua-hang/danh-sach-san-pham/${item._id}`}>Sản phẩm</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>
               <Link href={`/quan-ly-cua-hang/them-san-pham/${item._id}`}>Tạo mới sản phẩm</Link>
             </DropdownMenuItem>
+            <DropdownMenuItem>Xem đánh giá của khách</DropdownMenuItem>
 
             <DropdownMenuItem>Xóa cửa hàng</DropdownMenuItem>
           </DropdownMenuContent>
