@@ -12,11 +12,36 @@ Công nghệ
 **Back-end**
 
 *   Nodejs
-*   MongoDB
+*   jwt
+*   mongodb
 *   Express
+*   .....
+
+
 **Front-end**
 
 * Nextjs 15
+* react-hook-form
+* UI:Shadcn,tailwindcss
+* ....
+
+**Cơ sở dữ liệu**
+
+  * Mongodb
+
+**Test Api**
+
+  * Postman
+
+**Code Editor**
+
+  * Vs code
+
+**Deloy website**
+
+  * Vps ubuntu 22.04
+  * Ubuntu 22.04
+
 Cách chạy dự án ở localhost
 ---------------------------
 
