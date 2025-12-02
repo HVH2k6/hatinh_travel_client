@@ -12,7 +12,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <Provider store={store}>
       <TranslatorProvider>
-        {/* <AdvancedAutoTranslator /> */}
+        
         <AuthProvider>{children}</AuthProvider>
       </TranslatorProvider>
     </Provider>

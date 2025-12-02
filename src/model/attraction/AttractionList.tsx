@@ -1,6 +1,6 @@
 import { IAttraction } from '@/interfaces/IAttraction'
-import AttractionCard from './Card'
-import Heading from '../text/Heading'
+import AttractionCard from '../../components/attraction/Card'
+import Heading from '../../components/text/Heading'
 import { STATUS } from '@/util/constant'
 
 type Props = { data: IAttraction[] }
@@ -19,7 +19,7 @@ export default function AttractionList({ data }: Props) {
       
       <Heading title='Địa điểm du lịch' url='/dia-diem-du-lich/xem-tat-ca'/>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {data.map((item) => (
+      {data.slice(0, 4).map((item) => (
         item.status.toLowerCase() == STATUS.ACTIVE && <AttractionCard key={item._id} attraction={item} />
         
       ))}

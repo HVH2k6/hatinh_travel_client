@@ -15,11 +15,15 @@ import {
   Check,
   Truck
 } from 'lucide-react';
+import PriceDisplay from '@/helper/covertMoney';
 
-// Giả lập data từ props server trả về
+// Import Component xử lý tiền tệ đa ngôn ngữ
+// import PriceDisplay from '@/components/common/PriceDisplay';
+
+// Giả lập data (Trong thực tế bạn sẽ nhận từ props)
 const productData: any = {
     "_id": "6928ad699d9f7f1a2e08f20f",
-    "name": "Chim Rừng Tự Nhiên (Đặc Sản)", // Mình sửa tên xíu cho hợp context du lịch
+    "name": "Chim Rừng Tự Nhiên (Đặc Sản)",
     "price": 59000000,
     "description": "<p>Chim rừng tự nhiên quý hiếm, phù hợp làm quà biếu tặng hoặc ngâm rượu. <br/> Đảm bảo nguồn gốc tự nhiên 100%.</p>",
     "image": "https://res.cloudinary.com/dceqnckf1/image/upload/v1764273497/qiwgweqhzkfxf1yolwxu.svg",
@@ -42,20 +46,15 @@ const productData: any = {
             "phone": "0987654312"
         },
         "_id": "691e028a5bbc141a5f916743",
-        "name": "Đồ Biển Việt Nam"
+        "name": "Đồ Biển Việt Nam",
+        "slug": "do-bien-viet-nam" // Giả sử có slug
     },
     "createdAt": "2025-11-27T19:58:33.900Z",
     "slug": "chim-rung"
 };
 
-// Formatter tiền tệ
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-};
-
 export default function ProductDetailPage() {
-  // Logic Gallery ảnh
-  // Gộp ảnh đại diện và list_image thành 1 mảng để hiển thị
+  // Logic Gallery ảnh: Gộp ảnh đại diện và list_image
   const allImages = [productData.image, ...productData.list_image].filter(Boolean);
   const [selectedImage, setSelectedImage] = useState(allImages[0]);
 
@@ -63,7 +62,16 @@ export default function ProductDetailPage() {
     <div className="min-h-screen bg-[#F8F9FA] pb-20 font-sans text-slate-800">
       
       {/* 1. Breadcrumb (Điều hướng) */}
-    
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
+           <Link href="/" className="hover:text-blue-600">Trang chủ</Link> 
+           <ChevronRight className="w-4 h-4" />
+           <Link href="/dac-san" className="hover:text-blue-600">Đặc sản</Link>
+           <ChevronRight className="w-4 h-4" />
+           <span className="text-gray-900 font-medium truncate">{productData.name}</span>
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 mt-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
@@ -96,7 +104,7 @@ export default function ProductDetailPage() {
                ))}
             </div>
 
-            {/* Mô tả chi tiết (Đặt ở dưới ảnh trên Mobile/Desktop) */}
+            {/* Mô tả chi tiết */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mt-8">
                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                  <ShieldCheck className="w-5 h-5 text-green-600" />
@@ -115,6 +123,7 @@ export default function ProductDetailPage() {
               
               {/* Card Thông tin Chính */}
               <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                 
                  {/* Tên & Badge */}
                  <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -130,14 +139,15 @@ export default function ProductDetailPage() {
                     </h1>
                  </div>
 
-                 {/* Giá & Đơn vị */}
+                 {/* --- PHẦN SỬA LẠI: GIÁ & ĐƠN VỊ --- */}
                  <div className="bg-gray-50 rounded-xl p-4 mb-6 flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold text-red-600">
-                       {formatCurrency(productData.price)}
-                    </span>
-                    <span className="text-gray-500 font-medium text-lg">
-                       / {productData.unitId.symbol}
-                    </span>
+                    {/* Sử dụng component PriceDisplay */}
+                    <PriceDisplay 
+                        value={productData.price}
+                        unit={productData.unitId.symbol} // Truyền đơn vị vào
+                        className="text-3xl font-extrabold text-red-600" // Style cho giá
+                        unitClassName="text-gray-500 font-medium text-lg ml-1" // Style cho đơn vị
+                    />
                  </div>
 
                  {/* Thông tin Shop */}
@@ -151,11 +161,10 @@ export default function ProductDetailPage() {
                           {productData.shopId.name}
                           <ShieldCheck className="w-4 h-4 text-blue-500" fill="currentColor" color="white" />
                        </h4>
-                    
                     </div>
-                    <button className="text-sm font-semibold text-blue-600 hover:underline">
-                       <Link href={`/cua-hang/${productData.shopId.slug}`} className="block w-full">Xem Shop </Link>
-                    </button>
+                    <div className="text-sm font-semibold text-blue-600 hover:underline">
+                       <Link href={`/cua-hang/${productData.shopId.slug || '#'}`}>Xem Shop</Link>
+                    </div>
                  </div>
 
                  {/* Nút Hành Động (CTA) */}
@@ -185,16 +194,26 @@ export default function ProductDetailPage() {
                  </div>
               </div>
               
-              
-      
+              {/* Card Cam kết */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                 <h4 className="font-bold text-gray-900 mb-3">Cam kết chất lượng</h4>
+                 <ul className="space-y-3">
+                    <li className="flex items-start gap-2 text-sm text-gray-600">
+                        <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                        Sản phẩm 100% tự nhiên
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-600">
+                        <Check className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                        Được kiểm duyệt bởi BQL Chợ
+                    </li>
+                 </ul>
+              </div>
 
             </div>
           </div>
           
         </div>
       </main>
-      
-   
     </div>
   );
 }

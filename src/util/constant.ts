@@ -1,4 +1,5 @@
 import {
+  Cake,
   FileType,
   Map,
   Scale,
@@ -107,6 +108,24 @@ export const menuSidebarAdmin = [
       {
         title: 'Tạo mới chợ',
         url: '/quan-ly/cua-hang/tao-moi',
+      },
+    ],
+  },
+  {
+    title: 'Đặc sản',
+    url: '#',
+    icon: Cake,
+    page: 'admin',
+
+    items: [
+      {
+        title: 'Danh sách đặc sản',
+        url: '/quan-ly/dac-san',
+      },
+   
+      {
+        title: 'Tạo mới đặc sản',
+        url: '/quan-ly/dac-san/tao-moi',
       },
     ],
   },
