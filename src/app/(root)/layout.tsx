@@ -4,7 +4,7 @@ import { IDistricts } from "@/interfaces/IAddress";
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const districts: IDistricts[] = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/address/districts?province_code=42`,
+    `https://hatinh-travel-server.vercel.app/api/address/districts?province_code=42`,
     { cache: "no-store" } // hoặc "force-cache" nếu muốn cache
   ).then((res) => res.json())
 
