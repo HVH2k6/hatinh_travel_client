@@ -10,12 +10,18 @@ export async function POST(req: Request) {
     // Hỗ trợ dịch mảng (Batch)
     if (Array.isArray(text)) {
        const results = await Promise.all(
-          text.map(t => translate(t, { to: targetLang }).then(res => res.text).catch(() => t))
+          text.map((t: any) => 
+             translate(t, { to: targetLang })
+             .then((res: any) => res.text) // Đã thêm (res: any) để sửa lỗi
+             .catch(() => t)
+          )
        );
        return NextResponse.json({ text: results });
     }
 
-    const res = await translate(text, { to: targetLang });
+    // Dịch đơn lẻ
+    // Thêm : any vào đây luôn cho chắc ăn
+    const res: any = await translate(text, { to: targetLang });
     return NextResponse.json({ text: res.text });
 
   } catch (error: any) {

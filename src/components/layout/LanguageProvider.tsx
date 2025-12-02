@@ -9,6 +9,7 @@ interface LanguageContextType {
   lang: Lang;
   setLang: (lang: Lang) => void;
   isLoading: boolean;
+  formatCurrency: (amount: number) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -49,6 +50,27 @@ function hashString(s: string) {
   return String(h >>> 0);
 }
 
+// --- Currency Formatting ---
+function formatCurrency(amount: number, lang: Lang): string {
+  const exchangeRates = {
+    vi: { rate: 1, symbol: "₫", locale: "vi-VN" },
+    en: { rate: 0.000040, symbol: "$", locale: "en-US" }, // 1 VND ≈ 0.00004 USD
+    zh: { rate: 0.00029, symbol: "¥", locale: "zh-CN" }  // 1 VND ≈ 0.00029 CNY
+  };
+
+  const config = exchangeRates[lang];
+  const converted = amount * config.rate;
+
+  // Format number with locale
+  const formatted = new Intl.NumberFormat(config.locale, {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: lang === 'vi' ? 0 : 2
+  }).format(converted);
+
+  return `${config.symbol}${formatted}`;
+}
+
 // --- Provider Component ---
 
 export default function TranslatorProvider({ children }: { children: React.ReactNode }) {
@@ -75,6 +97,11 @@ export default function TranslatorProvider({ children }: { children: React.React
       setLangState(saved);
     }
   }, []);
+
+  // Hàm format currency
+  const formatCurrencyFn = (amount: number) => {
+    return formatCurrency(amount, lang);
+  };
 
   // Hàm thay đổi ngôn ngữ (gọi từ Header)
   const setLang = (newLang: Lang) => {
@@ -215,7 +242,7 @@ export default function TranslatorProvider({ children }: { children: React.React
   }, [lang]);
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, isLoading }}>
+    <LanguageContext.Provider value={{ lang, setLang, isLoading, formatCurrency: formatCurrencyFn }}>
       {/* Thêm class để CSS biết đang ở ngôn ngữ nào (nếu cần font khác) */}
       <div lang={lang} className={isLoading ? "translating" : ""}>
         {children}

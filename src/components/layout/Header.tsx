@@ -118,9 +118,9 @@ export default function Header({ districts }: { districts: IDistricts[] }) {
                       <span className="fi fi-us"></span>
                       {lang === 'en' && <Check className="ml-auto h-4 w-4" />}
                    </DropdownMenuItem>
-                   <DropdownMenuItem onClick={() => setLang('zh-CN')}>
+                   <DropdownMenuItem onClick={() => setLang('zh')}>
                       <span className="fi fi-cn"></span>
-                      {lang === 'zh-CN' && <Check className="ml-auto h-4 w-4" />}
+                      {lang === 'zh' && <Check className="ml-auto h-4 w-4" />}
                    </DropdownMenuItem>
                 </DropdownMenuContent>
              </DropdownMenu>
