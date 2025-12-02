@@ -5,14 +5,14 @@ import { Provider } from 'react-redux';
 import { store } from '@/redux/store';
 import AuthProvider from '@/components/auth/AuthWrapper';
 
-import { AdvancedAutoTranslator } from '../language/AdvancedAutoTranslator';
+
 import TranslatorProvider from './LanguageProvider';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <Provider store={store}>
       <TranslatorProvider>
-        {/* <AdvancedAutoTranslator /> */}
+        
         <AuthProvider>{children}</AuthProvider>
       </TranslatorProvider>
     </Provider>

@@ -1,12 +1,13 @@
 'use client'
 
-import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin } from 'lucide-react'
 import { IAttraction } from '@/interfaces/IAttraction'
+import PriceDisplay from '@/helper/covertMoney'
+
 
 type Props = { attraction: IAttraction }
 
@@ -22,14 +23,11 @@ export default function AttractionCard({ attraction }: Props) {
     typeId,
   } = attraction
 
-  // Chốt locale để không lệch SSR/CSR
-  const nf = useMemo(() => new Intl.NumberFormat('vi-VN'), [])
-
-  // Chuẩn hoá số (nếu API trả string)
+  // Chuẩn hoá số an toàn
   const min = typeof minPrice === 'number' ? minPrice : Number(minPrice ?? 0)
   const max = typeof maxPrice === 'number' ? maxPrice : Number(maxPrice ?? 0)
 
-  const priceText = isFree ? 'Miễn phí' : `Giá từ ${nf.format(min)} – ${nf.format(max)} đ`
+  // Xử lý địa chỉ
   const location =
     [address?.wardId?.name, address?.districtId?.name, address?.provinceId?.name]
       .filter(Boolean)
@@ -48,7 +46,7 @@ export default function AttractionCard({ attraction }: Props) {
         "
         aria-label={name}
       >
-        {/* IMAGE */}
+        {/* IMAGE AREA */}
         <div className="relative w-full aspect-[4/3]">
           {image ? (
             <Image
@@ -65,24 +63,20 @@ export default function AttractionCard({ attraction }: Props) {
             </div>
           )}
 
-          {/* Gradient overlay để chữ nổi hơn */}
+          {/* Gradient overlay */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
 
-          {/* TYPE pill (góc dưới trái) */}
-          {typeId?.name ? (
+          {/* TYPE pill (Bottom Left) */}
+          {typeId?.name && (
             <Badge
-              className="
-                absolute left-3 bottom-3 z-[1]
-                bg-white/90 text-gray-800 shadow
-                backdrop-blur-sm
-              "
+              className="absolute left-3 bottom-3 z-[1] bg-white/90 text-gray-800 shadow backdrop-blur-sm"
               variant="secondary"
             >
               {typeId.name}
             </Badge>
-          ) : null}
+          )}
 
-          {/* PRICE pill (góc trên phải) */}
+          {/* PRICE pill (Top Right) */}
           <Badge
             className="
               absolute right-3 top-3 z-[1]
@@ -90,11 +84,42 @@ export default function AttractionCard({ attraction }: Props) {
               group-hover:translate-y-[-1px] transition-transform
             "
           >
-            {priceText}
+            {isFree ? (
+              // Case: Miễn phí -> Text này sẽ được Auto Translate dịch
+              <span>Miễn phí</span>
+            ) : (
+              // Case: Có phí
+              <div className="flex items-center gap-1 font-medium">
+                {min > 0 && min < max ? (
+                  // Dải giá: "Giá từ 100k - 200k"
+                  <>
+                    <span className="font-normal opacity-90 mr-1">Giá từ</span>
+                    <PriceDisplay 
+                        value={min} 
+                        className="text-white font-bold" // Ghi đè màu đỏ mặc định thành trắng
+                        unitClassName="hidden" // Ẩn đơn vị ở số min cho gọn
+                    />
+                    <span>-</span>
+                    <PriceDisplay 
+                        value={max} 
+                        className="text-white font-bold" 
+                        unitClassName="text-white/80 font-normal ml-0.5 text-xs" 
+                    />
+                  </>
+                ) : (
+                  // Một giá duy nhất: "200k"
+                  <PriceDisplay 
+                      value={max > 0 ? max : min} 
+                      className="text-white font-bold" 
+                      unitClassName="text-white/80 font-normal ml-0.5 text-xs" 
+                  />
+                )}
+              </div>
+            )}
           </Badge>
         </div>
 
-        {/* CONTENT */}
+        {/* INFO CONTENT */}
         <CardHeader className="flex-grow space-y-2">
           <CardTitle className="line-clamp-2 text-lg sm:text-xl">
             {name}
@@ -106,7 +131,6 @@ export default function AttractionCard({ attraction }: Props) {
         </CardHeader>
 
         <CardContent className="pb-5">
-          {/* CTA nhẹ nhàng ở chân thẻ */}
           <div
             className="
               inline-flex items-center gap-1 rounded-full px-3 py-1

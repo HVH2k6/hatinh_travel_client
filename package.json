@@ -39,6 +39,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "flag-icons": "^7.5.0",
+    "framer-motion": "^12.23.24",
     "google-translate-api-x": "^10.7.2",
     "i18n": "^0.15.3",
     "js-cookie": "^3.0.5",
