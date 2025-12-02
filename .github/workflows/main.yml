@@ -1,0 +1,44 @@
+name: HaTinh Travel
+
+on:
+  push:
+    branches: [production]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy using ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: 2018
+        script: |
+          # --- BẮT ĐẦU ĐOẠN SỬA ---
+          # 1. Nạp thủ công cấu hình NVM (Để GitHub nhận diện được Node 22)
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+          # 2. Kiểm tra lại cho chắc (Sẽ hiện v22 trong log)
+          node -v 
+          # --- KẾT THÚC ĐOẠN SỬA ---
+
+          cd /home/hatinh_travel_client
+          
+          # Fix lỗi Git authentication (Dùng Token thay cho user/pass)
+          # Nhớ tạo secret GH_TOKEN trong Settings GitHub trước nhé
+          # git remote set-url origin https://${{ secrets.GH_TOKEN }}@github.com/HVH2k6/hatinh_travel_client.git
+
+          git fetch origin
+          git checkout production
+          git pull
+          
+          # Cài đặt và Build
+          npm install
+          npm run build
+          
+          # Khởi động lại PM2
+          # (Lệnh này tự động tìm đường dẫn PM2 đúng trong môi trường NVM)
+          pm2 reload ha_tinh_travel || pm2 start npm --name "ha_tinh_travel" -- start

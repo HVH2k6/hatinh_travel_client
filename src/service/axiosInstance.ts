@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 // Tạo Axios Instance
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3001/api', // Thay đổi baseURL theo môi trường của bạn
+  baseURL:process.env.NEXT_PUBLIC_API_URL, // Thay đổi baseURL theo môi trường của bạn
 });
 
 // Trạng thái refresh token
