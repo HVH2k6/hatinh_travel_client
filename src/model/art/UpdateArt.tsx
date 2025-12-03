@@ -32,6 +32,7 @@ import { getProvinces } from '@/util/constant';
 import { HandleCreateArt, HandleUpdateArt } from '@/action/HandleArt';
 import { MapPin, Image as ImageIcon, Info, FileText } from 'lucide-react'; // Icon cho đẹp
 import { IArt } from '@/interfaces/IArt';
+import { useRouter } from 'next/navigation';
 
 /* ============================ SCHEMA ============================ */
 export const formSchema = z.object({
@@ -62,6 +63,7 @@ interface Props {
 /* ============================ COMPONENT ============================ */
 const UpdateArt = ({ data }: Props) => {
   const [provinces, setProvinces] = useState<any[]>([]);
+  const router = useRouter();
 
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -100,20 +102,7 @@ const UpdateArt = ({ data }: Props) => {
     const ok = await HandleUpdateArt(payload as any, (data as any)._id );
     if (ok) {
       toast.success('Sửa thành công');
-      form.reset({
-        name: '',
-        image: '',
-        list_image: [],
-        description: '',
-        categoryId: '',
-        video_url: '',
-        address: {
-          provinceId: form.getValues('address.provinceId') || '',
-          districtId: '',
-          wardId: '',
-          detail: '',
-        },
-      });
+      router.push('/quan-ly/nghe-thuat');
     }
   };
   const handleError = (e: any) => console.log(e);
