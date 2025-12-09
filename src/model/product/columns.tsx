@@ -56,9 +56,9 @@ function ActionsCell({ id }: { id: string }) {
         variant='outline'
         size='icon'
         className='text-blue-600 hover:text-blue-800 border-blue-200'
-        aria-label='Sửa sản phẩm'
+        aria-label='Đánh giá sản phẩm'
       >
-        <Link href={`/quan-ly-cua-hang/san-pham/sua/${id}`}>
+        <Link href={`/quan-ly-cua-hang/san-pham/${id}/danh-gia`}>
           <Eye className='w-4 h-4' />
         </Link>
       </Button>

@@ -1,3 +1,4 @@
+import ChatWidget from "@/components/chat/ChatWidget";
 import Header from "@/components/layout/Header";
 
 import { IDistricts } from "@/interfaces/IAddress";
@@ -12,6 +13,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
     <>
       <Header districts={districts} />
       <div className="container pt-20">{children}</div>
+      <ChatWidget/>
     </>
   );
 }

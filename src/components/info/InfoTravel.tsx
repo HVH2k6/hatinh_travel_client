@@ -96,7 +96,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
       <section className='relative w-full h-[90vh] flex items-center justify-center overflow-hidden'>
         <div className='absolute inset-0 z-0'>
           <img
-            src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349448/ib71giz4hr3y0kcxbq5a.jpg'
+            src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764818773/zzfpepqrx1sps9f1muk7.jpg'
             alt='Ha Tinh Landscape'
             className='w-full h-full object-cover brightness-[0.75]'
             loading='eager'
@@ -206,7 +206,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
               </div>
               <div className='absolute bottom-0 left-0 w-3/5 h-3/5 rounded-2xl overflow-hidden shadow-xl border-4 border-white z-20 hover:shadow-2xl transition-shadow duration-500'>
                 <img
-                  src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349448/ib71giz4hr3y0kcxbq5a.jpg'
+                  src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764818880/jdcoxujazxjd999ql2gm.jpg'
                   className='w-full h-full object-cover hover:scale-105 transition-transform duration-700'
                   alt='Biển Thiên Cầm'
                   loading='lazy'
