@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ReviewSection from '@/components/review/ReviewSection';
 
 // --- HELPER FETCH PRODUCTS ---
 async function fetchProductsByShop(shopId: string): Promise<IProduct[]> {
@@ -254,6 +255,7 @@ export default async function ShopDetailPage({ shop }: { shop: IShop }) {
                 </div>
               )}
             </div>
+            <ReviewSection targetId={shop._id} targetType='Shop'/>
           </div>
 
           {/* CỘT PHẢI (4/12): Sticky Contact Sidebar */}

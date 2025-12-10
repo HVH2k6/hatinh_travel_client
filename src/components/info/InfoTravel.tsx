@@ -1,19 +1,16 @@
 'use client';
 
 import React from 'react';
-import Head from 'next/head';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight,
-  MapPin,
   Waves,
   Mountain,
   History,
   Calendar,
   CheckCircle2,
+  MapPin,
 } from 'lucide-react';
 
-// --- UI Components (Giả định đã cài đặt Shadcn UI) ---
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -27,83 +24,8 @@ import { IAttraction } from '@/interfaces/IAttraction';
 import AttractionList from '@/model/attraction/AttractionList';
 import ListFood from '@/model/food/ListFood';
 import { IFood } from '@/interfaces/IFood';
-
-
-// --- DỮ LIỆU ---
-
-// Cập nhật Milestones thêm hình ảnh
-const milestonesWithImages = [
-  {
-    year: 'Thế kỷ X - XV',
-    title: 'Vùng Đất Phên Dậu & Di Sản Văn Hóa',
-    description:
-      'Hà Tĩnh giữ vị trí chiến lược quân sự quan trọng. Thời kỳ này hình thành nên cốt cách con người kiên trung và kho tàng văn hóa dân gian Ví, Giặm đặc sắc (Di sản văn hóa phi vật thể đại diện của nhân loại).',
-    image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349424/qpveehw8urt1otksmtkr.jpg', // Ảnh minh họa: Văn hóa/Cổ kính
-    icon: <History className='w-5 h-5' />,
-  },
-  {
-    year: '1968',
-    title: 'Huyền Thoại Ngã Ba Đồng Lộc',
-    description:
-      "Biểu tượng của chủ nghĩa anh hùng cách mạng. Sự hy sinh của 10 nữ thanh niên xung phong đã biến nơi đây thành 'địa chỉ đỏ' giáo dục truyền thống và điểm du lịch tâm linh trọng điểm.",
-    image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/sz0f6vhhsqhgmbgrr1ki.jpg', // Ảnh minh họa: Tượng đài Đồng Lộc (Thay bằng link ảnh thật nếu có)
-    icon: <MapPin className='w-5 h-5' />,
-  },
-  {
-    year: '2010s',
-    title: 'Đánh Thức Tiềm Năng Du Lịch Biển',
-    description:
-      'Hà Tĩnh tập trung khai thác 137km đường bờ biển. Các khu du lịch Thiên Cầm, Xuân Thành được đầu tư hạ tầng, trở thành điểm đến nghỉ dưỡng hè hấp dẫn khu vực Bắc Trung Bộ.',
-    image:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop', // Ảnh minh họa: Biển
-    icon: <Waves className='w-5 h-5' />,
-  },
-  {
-    year: '2020 - Nay',
-    title: 'Phát Triển Du Lịch Xanh & Đa Trải Nghiệm',
-    description:
-      'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn QG Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
-    image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/ep25kbhtvai4xbsugwag.jpg', // Ảnh minh họa: Sân golf/Resort sinh thái
-    icon: <Mountain className='w-5 h-5' />,
-  },
-];
-
-const destinations = [
-  {
-    id: 1,
-    name: 'Biển Thiên Cầm',
-    category: 'Nghỉ dưỡng biển',
-    image:
-      'https://cdn.vntrip.vn/cam-nang/wp-content/uploads/2017/07/bien-thien-cam-ha-tinh-vntrip-3.jpg',
-    desc: 'Bãi biển đẹp nhất Hà Tĩnh với cát trắng mịn, nước trong xanh và sóng êm đềm như tiếng đàn.',
-  },
-  {
-    id: 2,
-    name: 'Khu di tích Nguyễn Du',
-    category: 'Văn hóa - Lịch sử',
-    image:
-      'https://hatinh.gov.vn/uploads/images/2022/09/23/khu-luu-niem-nguyen-du-1663924896.jpg',
-    desc: 'Quê hương Đại thi hào dân tộc, nơi lưu giữ những giá trị văn hóa Truyện Kiều bất hủ.',
-  },
-  {
-    id: 3,
-    name: 'Hồ Kẻ Gỗ',
-    category: 'Sinh thái',
-    image: 'https://static.vinwonders.com/production/ho-ke-go-ha-tinh-2.jpg',
-    desc: 'Hồ nước ngọt nhân tạo khổng lồ giữa rừng già, cảnh sắc thơ mộng, lý tưởng cho du thuyền và cắm trại.',
-  },
-  {
-    id: 4,
-    name: 'Chùa Hương Tích',
-    category: 'Tâm linh',
-    image:
-      'https://ik.imagekit.io/tvlk/blog/2023/03/chua-huong-tich-ha-tinh-2.jpg',
-    desc: "Được mệnh danh là 'Hoan Châu đệ nhất danh lam', tọa lạc trên đỉnh núi Hồng Lĩnh hùng vĩ.",
-  },
-];
+import { IArt } from '@/interfaces/IArt';
+import ListArt from '@/model/art/ListArt';
 
 // --- Animation Variants ---
 const fadeInUp = {
@@ -111,46 +33,75 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
-const staggerContainer = {
-  hidden: { opacity: 1 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-    },
+// --- Milestones Data ---
+const milestonesWithImages = [
+  {
+    year: 'Thế kỷ X - XV',
+    title: 'Vùng Đất Phên Dậu & Di Sản Văn Hóa',
+    description:
+      'Hà Tĩnh giữ vị trí chiến lược quân sự quan trọng. Thời kỳ này hình thành nên cốt cách con người kiên trung và kho tàng văn hóa dân gian Ví, Giặm đặc sắc (Di sản văn hóa phi vật thể đại diện của nhân loại).',
+    image:
+      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349424/qpveehw8urt1otksmtkr.jpg',
+    icon: History,
   },
-};
-type Props = { data: IAttraction[] ,foods: IFood[]};
+  {
+    year: '1968',
+    title: 'Huyền Thoại Ngã Ba Đồng Lộc',
+    description:
+      'Biểu tượng của chủ nghĩa anh hùng cách mạng. Sự hy sinh của 10 nữ thanh niên xung phong đã biến nơi đây thành "địa chỉ đỏ" giáo dục truyền thống và điểm du lịch tâm linh trọng điểm.',
+    image:
+      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/sz0f6vhhsqhgmbgrr1ki.jpg',
+    icon: MapPin,
+  },
+  {
+    year: '2010s',
+    title: 'Đánh Thức Tiềm Năng Du Lịch Biển',
+    description:
+      'Hà Tĩnh tập trung khai thác 137km đường bờ biển. Các khu du lịch Thiên Cầm, Xuân Thành được đầu tư hạ tầng, trở thành điểm đến nghỉ dưỡng hè hấp dẫn khu vực Bắc Trung Bộ.',
+    image:
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop',
+    icon: Waves,
+  },
+  {
+    year: '2020 - Nay',
+    title: 'Phát Triển Du Lịch Xanh & Đa Trải Nghiệm',
+    description:
+      'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn QG Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
+    image:
+      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/ep25kbhtvai4xbsugwag.jpg',
+    icon: Mountain,
+  },
+];
 
-export default function HaTinhLandingPage({ data, foods }: Props) {
-  console.log(">>>> food", foods);
-  if (!data?.length) {
+type Props = { 
+  data: IAttraction[];
+  foods: IFood[];
+  arts: IArt[];
+};
+
+export default function HaTinhLandingPage({ data, foods, arts }: Props) {
+  if (!data?.length && !foods?.length && !arts?.length) {
     return (
-      <p className='text-center text-muted-foreground'>
-        Không có địa điểm nào.
-      </p>
+      <div className='min-h-screen flex items-center justify-center bg-slate-50'>
+        <p className='text-center text-muted-foreground text-lg'>
+          Đang tải dữ liệu...
+        </p>
+      </div>
     );
   }
+
   return (
     <main className='bg-slate-50 font-sans text-slate-900 overflow-x-hidden'>
-      <Head>
-        <title>Du Lịch Hà Tĩnh - Hành Trình Di Sản & Thiên Nhiên</title>
-        <meta
-          name='description'
-          content='Khám phá Hà Tĩnh - Vùng đất của văn hóa Ví Giặm, biển Thiên Cầm và núi Hồng Lĩnh.'
-        />
-      </Head>
-
-      {/* --- SECTION 1: HERO (Ấn tượng ban đầu) --- */}
-      {/* Sử dụng kỹ thuật breakout container để tràn viền */}
-      <section className='relative w-screen ml-[calc(-50vw+50%)] h-[90vh] flex items-center justify-center overflow-hidden'>
+      {/* --- HERO SECTION --- */}
+      <section className='relative w-full h-[90vh] flex items-center justify-center overflow-hidden'>
         <div className='absolute inset-0 z-0'>
           <img
-            src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349448/ib71giz4hr3y0kcxbq5a.jpg' // Ảnh núi non hùng vĩ
+            src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764818773/zzfpepqrx1sps9f1muk7.jpg'
             alt='Ha Tinh Landscape'
-            className='w-full h-full object-cover brightness-[0.8]'
+            className='w-full h-full object-cover brightness-[0.75]'
+            loading='eager'
           />
-          <div className='absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-slate-900/60' />
+          <div className='absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-slate-900/70' />
         </div>
 
         <div className='relative z-10 container mx-auto px-6 text-center text-white mt-16'>
@@ -160,138 +111,125 @@ export default function HaTinhLandingPage({ data, foods }: Props) {
             variants={fadeInUp}
             className='max-w-4xl mx-auto'
           >
-            <Badge className='mb-6 px-4 py-1.5 text-sm bg-purple-500/80 text-white backdrop-blur-md border-0 hover:bg-purple-600/80 uppercase tracking-wider font-medium'>
+            <Badge className='mb-6 px-5 py-2 text-sm bg-purple-500/90 text-white backdrop-blur-md border-0 hover:bg-purple-600/90 uppercase tracking-wider font-semibold shadow-lg'>
               Chào mừng đến với Hà Tĩnh
             </Badge>
-            <h1 className='text-5xl md:text-7xl lg:text-8xl font-bold  mb-8 leading-tight drop-shadow-2xl'>
+            <h1 className='text-5xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-[1.1] drop-shadow-2xl'>
               Về Miền <br />
-              <span className='text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-amber-200'>
+              <span className='text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-amber-200 animate-gradient'>
                 Ví, Giặm Sông La
               </span>
             </h1>
-            <p className='text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed font-light drop-shadow-md'>
+            <p className='text-xl md:text-2xl text-slate-100 max-w-2xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg'>
               Nơi hội tụ tinh hoa văn hóa ngàn năm, những bãi biển hoang sơ và
               lịch sử hào hùng của miền Trung nắng gió.
             </p>
             <div className='flex flex-col sm:flex-row gap-5 justify-center'>
               <Button
                 size='lg'
-                className='bg-purple-600 hover:bg-purple-700 text-white rounded-full h-14 px-10 text-lg shadow-xl shadow-purple-900/30 border-0 font-semibold transition-transform hover:-translate-y-1'
+                className='bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-full h-14 px-10 text-lg shadow-2xl shadow-purple-900/40 border-0 font-semibold transition-all duration-300 hover:-translate-y-1 hover:shadow-3xl'
               >
                 Bắt đầu khám phá
               </Button>
               <Button
                 size='lg'
                 variant='outline'
-                className='bg-white/10 backdrop-blur-md border-white/40 text-white hover:bg-white/20 hover:border-white rounded-full h-14 px-10 text-lg font-semibold transition-transform hover:-translate-y-1'
+                className='bg-white/15 backdrop-blur-md border-white/50 text-white hover:bg-white/25 hover:border-white rounded-full h-14 px-10 text-lg font-semibold transition-all duration-300 hover:-translate-y-1'
               >
                 Xem video giới thiệu
               </Button>
             </div>
           </motion.div>
         </div>
-        {/* Scroll indicator */}
-        <div className='absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/70'>
+        
+        <div className='absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/80'>
           <Waves className='w-8 h-8' />
         </div>
       </section>
 
-      {/* --- SECTION 2: INTRO & SUMMARY (Giới thiệu tóm tắt) --- */}
+      {/* --- INTRO SECTION --- */}
       <section className='py-24 bg-white relative z-20'>
         <div className='container mx-auto px-6'>
           <motion.div
             initial='hidden'
             whileInView='visible'
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.3 }}
             variants={fadeInUp}
             className='grid md:grid-cols-2 gap-16 items-center'
           >
-            {/* Left Content */}
             <div>
-              <h2 className='text-4xl md:text-5xl  font-bold text-slate-900 mb-8 leading-tight'>
+              <h2 className='text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight'>
                 Một thoáng <br className='hidden md:block' />
                 <span className='text-purple-700 relative inline-block'>
                   Hà Tĩnh
-                  <span className='absolute bottom-1 left-0 w-full h-3 bg-purple-200/50 -z-10'></span>
+                  <span className='absolute bottom-1 left-0 w-full h-3 bg-purple-200/60 -z-10 rounded-sm'></span>
                 </span>
               </h2>
-              <p className='text-slate-600 text-lg leading-relaxed mb-6 text-justify font-medium'>
+              <p className='text-slate-600 text-lg leading-relaxed mb-6 font-medium'>
                 Nằm ở dải đất miền Trung, Hà Tĩnh không chỉ nổi tiếng là vùng
-                đất `địa linh nhân kiệt`, quê hương của Đại thi hào Nguyễn Du,
+                đất địa linh nhân kiệt, quê hương của Đại thi hào Nguyễn Du,
                 mà còn được thiên nhiên ban tặng vẻ đẹp đa dạng từ núi rừng hùng
                 vĩ đến biển cả bao la.
               </p>
-              <p className='text-slate-600 text-lg leading-relaxed mb-10 text-justify'>
+              <p className='text-slate-600 text-lg leading-relaxed mb-10'>
                 Đến với Hà Tĩnh là đến với hành trình tìm về những giá trị văn
                 hóa truyền thống qua làn điệu dân ca Ví, Giặm sâu lắng, đắm mình
                 trong làn nước xanh biếc của biển Thiên Cầm, và tri ân những
                 người anh hùng tại Ngã ba Đồng Lộc huyền thoại.
               </p>
 
-              {/* Quick Stats - Best Practice cho landing page */}
               <div className='grid grid-cols-2 gap-6'>
-                <div className='flex items-center gap-3'>
-                  <CheckCircle2 className='text-purple-600 w-6 h-6' />
-                  <span className='text-slate-700 font-semibold'>
-                    137km bờ biển
-                  </span>
-                </div>
-                <div className='flex items-center gap-3'>
-                  <CheckCircle2 className='text-purple-600 w-6 h-6' />
-                  <span className='text-slate-700 font-semibold'>
-                    Di sản UNESCO
-                  </span>
-                </div>
-                <div className='flex items-center gap-3'>
-                  <CheckCircle2 className='text-purple-600 w-6 h-6' />
-                  <span className='text-slate-700 font-semibold'>
-                    99 đỉnh Non Hồng
-                  </span>
-                </div>
-                <div className='flex items-center gap-3'>
-                  <CheckCircle2 className='text-purple-600 w-6 h-6' />
-                  <span className='text-slate-700 font-semibold'>
-                    Ẩm thực đặc sắc
-                  </span>
-                </div>
+                {[
+                  { icon: Waves, text: '137km bờ biển' },
+                  { icon: Mountain, text: 'Di sản UNESCO' },
+                  { icon: History, text: '99 đỉnh Non Hồng' },
+                  { icon: CheckCircle2, text: 'Ẩm thực đặc sắc' },
+                ].map((item, i) => (
+                  <div key={i} className='flex items-center gap-3 group'>
+                    <div className='p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors duration-300'>
+                      <item.icon className='text-purple-600 w-5 h-5' />
+                    </div>
+                    <span className='text-slate-700 font-semibold'>{item.text}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Right Image Composition */}
             <div className='relative h-[500px]'>
-              <div className='absolute top-0 right-0 w-4/5 h-4/5 rounded-2xl overflow-hidden shadow-2xl z-10'>
+              <div className='absolute top-0 right-0 w-4/5 h-4/5 rounded-2xl overflow-hidden shadow-2xl z-10 hover:shadow-3xl transition-shadow duration-500'>
                 <img
                   src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/vq6jjkn13vuosh5ekyap.jpg'
-                  className='w-full h-full object-cover'
+                  className='w-full h-full object-cover hover:scale-105 transition-transform duration-700'
                   alt='Khu lưu niệm Nguyễn Du'
+                  loading='lazy'
                 />
               </div>
-              <div className='absolute bottom-0 left-0 w-3/5 h-3/5 rounded-2xl overflow-hidden shadow-xl border-4 border-white z-20'>
+              <div className='absolute bottom-0 left-0 w-3/5 h-3/5 rounded-2xl overflow-hidden shadow-xl border-4 border-white z-20 hover:shadow-2xl transition-shadow duration-500'>
                 <img
-                  src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349448/ib71giz4hr3y0kcxbq5a.jpg'
-                  className='w-full h-full object-cover'
+                  src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764818880/jdcoxujazxjd999ql2gm.jpg'
+                  className='w-full h-full object-cover hover:scale-105 transition-transform duration-700'
                   alt='Biển Thiên Cầm'
+                  loading='lazy'
                 />
               </div>
-              {/* Decorative Element */}
-              <div className='absolute -top-10 -left-10 w-32 h-32 bg-purple-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 z-0'></div>
-              <div className='absolute bottom-10 right-10 w-32 h-32 bg-amber-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 z-0'></div>
+              <div className='absolute -top-10 -left-10 w-36 h-36 bg-purple-200/60 rounded-full mix-blend-multiply filter blur-3xl animate-pulse'></div>
+              <div className='absolute bottom-10 right-10 w-36 h-36 bg-amber-200/60 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000'></div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* --- SECTION 3: MILESTONES (Hành trình phát triển - ZIGZAG LAYOUT) --- */}
-      <section className='py-24 bg-slate-50 relative overflow-hidden'>
+      {/* --- MILESTONES SECTION --- */}
+      <section className='py-24 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden'>
         <div className='container mx-auto px-6 relative z-10'>
           <div className='text-center mb-20 max-w-3xl mx-auto'>
             <Badge
               variant='outline'
-              className='mb-4 text-purple-700 border-purple-300 bg-purple-50 uppercase tracking-wider'
+              className='mb-4 text-purple-700 border-purple-300 bg-purple-50 uppercase tracking-wider font-semibold px-4 py-1.5'
             >
               Dòng Chảy Lịch Sử
             </Badge>
-            <h2 className='text-4xl md:text-5xl  font-bold text-slate-900 mb-6'>
+            <h2 className='text-4xl md:text-5xl font-bold text-slate-900 mb-6'>
               Hành Trình & Thành Tựu
             </h2>
             <p className='text-slate-600 text-lg leading-relaxed'>
@@ -301,126 +239,167 @@ export default function HaTinhLandingPage({ data, foods }: Props) {
           </div>
 
           <div className='relative'>
-            {/* Đường kẻ dọc trung tâm */}
-            <div className='absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-200 via-purple-400 to-slate-200 hidden md:block rounded-full' />
+            <div className='absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-200 via-purple-400 to-transparent hidden md:block rounded-full' />
 
             <div className='space-y-24 md:space-y-32'>
-              {milestonesWithImages.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial='hidden'
-                  whileInView='visible'
-                  viewport={{ once: true, margin: '-100px' }}
-                  variants={fadeInUp}
-                  className={`flex flex-col md:flex-row items-center gap-10 md:gap-20 ${
-                    index % 2 !== 0 ? 'md:flex-row-reverse' : ''
-                  }`}
-                >
-                  {/* Image Side */}
-                  <div className='flex-1 w-full relative group'>
-                    <div className='relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3] z-20 transition-transform duration-500 group-hover:-translate-y-2'>
-                      {/* Overlay gradient để text dễ đọc nếu cần */}
-                      <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500'></div>
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
-                      />
-                    </div>
+              {milestonesWithImages.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial='hidden'
+                    whileInView='visible'
+                    viewport={{ once: true, margin: '-80px' }}
+                    variants={fadeInUp}
+                    className={`flex flex-col md:flex-row items-center gap-10 md:gap-20 ${
+                      index % 2 !== 0 ? 'md:flex-row-reverse' : ''
+                    }`}
+                  >
+                    <div className='flex-1 w-full relative group'>
+                      <div className='relative rounded-2xl overflow-hidden shadow-xl aspect-[4/3] z-20 transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl'>
+                        <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500'></div>
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-110'
+                          loading='lazy'
+                        />
+                      </div>
 
-                    {/* Decorative Icon on Image Corner */}
-                    <div
-                      className={`absolute -bottom-5 ${
-                        index % 2 !== 0 ? '-left-5' : '-right-5'
-                      } w-16 h-16 bg-white p-1 rounded-full shadow-lg z-30 hidden md:block`}
-                    >
-                      <div className='w-full h-full bg-purple-100 rounded-full flex items-center justify-center text-purple-700'>
-                        {item.icon}
+                      <div
+                        className={`absolute -bottom-5 ${
+                          index % 2 !== 0 ? '-left-5' : '-right-5'
+                        } w-16 h-16 bg-white p-1 rounded-full shadow-lg z-30 hidden md:block group-hover:scale-110 transition-transform duration-300`}
+                      >
+                        <div className='w-full h-full bg-gradient-to-br from-purple-100 to-purple-200 rounded-full flex items-center justify-center text-purple-700'>
+                          <Icon className='w-6 h-6' />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Timeline Node (Center Dot) */}
-                  <div className='absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-purple-600 border-4 border-white shadow-md z-10 hidden md:block' />
+                    <div className='absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-purple-600 border-4 border-white shadow-lg z-10 hidden md:block pulse-ring' />
 
-                  {/* Content Side */}
-                  <div className='flex-1 w-full relative z-20'>
-                    <Card className='border-none shadow-none bg-transparent'>
-                      <CardHeader className='p-0 mb-4'>
-                        <div
-                          className={`flex items-center gap-3 mb-4 ${
-                            index % 2 !== 0 ? 'md:flex-row-reverse' : ''
-                          }`}
-                        >
-                          <Calendar className='w-5 h-5 text-purple-600' />
-                          <span className='text-lg font-bold text-purple-700 tracking-wide'>
-                            {item.year}
-                          </span>
-                          <div className='flex-1 h-px bg-purple-200 hidden md:block'></div>
-                        </div>
-                        <CardTitle
-                          className={`text-2xl md:text-3xl font-bold text-slate-800 mb-4 leading-tight ${
-                            index % 2 !== 0 ? 'md:text-right' : 'md:text-left'
-                          }`}
-                        >
-                          {item.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className='p-0'>
-                        <CardDescription
-                          className={`text-lg text-slate-600 leading-relaxed ${
-                            index % 2 !== 0
-                              ? 'md:text-right md:pl-10'
-                              : 'md:text-left md:pr-10'
-                          }`}
-                        >
-                          {item.description}
-                        </CardDescription>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className='flex-1 w-full relative z-20'>
+                      <Card className='border-none shadow-none bg-transparent hover:bg-white/50 transition-colors duration-300 rounded-2xl p-6 md:p-8'>
+                        <CardHeader className='p-0 mb-4'>
+                          <div
+                            className={`flex items-center gap-3 mb-4 ${
+                              index % 2 !== 0 ? 'md:flex-row-reverse' : ''
+                            }`}
+                          >
+                            <Calendar className='w-5 h-5 text-purple-600' />
+                            <span className='text-lg font-bold text-purple-700 tracking-wide'>
+                              {item.year}
+                            </span>
+                            <div className='flex-1 h-px bg-gradient-to-r from-purple-200 to-transparent hidden md:block'></div>
+                          </div>
+                          <CardTitle
+                            className={`text-2xl md:text-3xl font-bold text-slate-900 mb-4 leading-tight ${
+                              index % 2 !== 0 ? 'md:text-right' : 'md:text-left'
+                            }`}
+                          >
+                            {item.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className='p-0'>
+                          <CardDescription
+                            className={`text-lg text-slate-600 leading-relaxed ${
+                              index % 2 !== 0
+                                ? 'md:text-right'
+                                : 'md:text-left'
+                            }`}
+                          >
+                            {item.description}
+                          </CardDescription>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </div>
-        {/* Background Pattern */}
-        <div className="absolute top-0 left-0 right-0 h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 z-0 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 right-0 h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlN2ZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30 z-0 pointer-events-none"></div>
       </section>
 
-      {/* --- SECTION 4: FEATURED DESTINATIONS (Điểm đến nổi bật) --- */}
-      <section className='pt-24  bg-white'>
-        <div className='container mx-auto px-6'>
-          <div className='text-center mb-16 max-w-3xl mx-auto'>
-            <h2 className='text-4xl md:text-5xl  font-bold text-slate-900 mb-6'>
-              Điểm Đến Không Thể Bỏ Lỡ
-            </h2>
-            <p className='text-slate-600 text-lg leading-relaxed'>
-              Khám phá những danh thắng mang đậm dấu ấn thiên nhiên và con người
-              Hà Tĩnh.
-            </p>
+      {/* --- ATTRACTIONS SECTION --- */}
+      {data && data.length > 0 && (
+        <section className='py-24 bg-white'>
+          <div className='container mx-auto px-6'>
+            <div className='text-center mb-16 max-w-3xl mx-auto'>
+              <h2 className='text-4xl md:text-5xl font-bold text-slate-900 mb-6'>
+                Điểm Đến Không Thể Bỏ Lỡ
+              </h2>
+              <p className='text-slate-600 text-lg leading-relaxed'>
+                Khám phá những danh thắng mang đậm dấu ấn thiên nhiên và con người
+                Hà Tĩnh.
+              </p>
+            </div>
+            <AttractionList data={data} />
           </div>
-          <AttractionList data={data || []} />
+        </section>
+      )}
 
-        
-        </div>
-      </section>
-       <section className='pt-24 bg-white'>
-        <div className='container mx-auto px-6'>
-          <div className='text-center mb-16 max-w-3xl mx-auto'>
-            <h2 className='text-4xl md:text-5xl  font-bold text-slate-900 mb-6'>
-              Đặc sản Không Thể Bỏ Lỡ
-            </h2>
-            <p className='text-slate-600 text-lg leading-relaxed'>
-              Khám phá những món ăn đặc sản mang đậm dấu ấn 
-              Hà Tĩnh.
-            </p>
+      {/* --- FOOD SECTION --- */}
+      {foods && foods.length > 0 && (
+        <section className='py-24 bg-slate-50'>
+          <div className='container mx-auto px-6'>
+            <div className='text-center mb-16 max-w-3xl mx-auto'>
+              <h2 className='text-4xl md:text-5xl font-bold text-slate-900 mb-6'>
+                Đặc Sản Không Thể Bỏ Lỡ
+              </h2>
+              <p className='text-slate-600 text-lg leading-relaxed'>
+                Khám phá những món ăn đặc sản mang đậm dấu ấn Hà Tĩnh.
+              </p>
+            </div>
+            <ListFood food={foods} />
           </div>
-          <ListFood food={foods || []} />
+        </section>
+      )}
 
-        
-        </div>
-      </section>
+      {/* --- ART SECTION --- */}
+      {arts && arts.length > 0 && (
+        <section className='py-24 bg-white'>
+          <div className='container mx-auto px-6'>
+            <div className='text-center mb-16 max-w-3xl mx-auto'>
+              <h2 className='text-4xl md:text-5xl font-bold text-slate-900 mb-6'>
+                Nghệ Thuật & Văn Hóa
+              </h2>
+              <p className='text-slate-600 text-lg leading-relaxed'>
+                Trải nghiệm những nét văn hóa nghệ thuật độc đáo của Hà Tĩnh.
+              </p>
+            </div>
+            <ListArt art={arts} />
+          </div>
+        </section>
+      )}
+
+      {/* Add custom styles for animations */}
+      <style jsx>{`
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
+        }
+        @keyframes pulse-ring {
+          0% {
+            box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+          }
+        }
+        .pulse-ring {
+          animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+      `}</style>
     </main>
   );
 }

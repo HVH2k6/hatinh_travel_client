@@ -485,15 +485,6 @@ export default function AttractionDetail({
                     </span>
                   </div>
 
-                  <div className='flex justify-between items-center p-3 bg-gray-50 rounded-xl'>
-                    <span className='text-sm text-gray-600 flex items-center'>
-                      <Calendar className='h-4 w-4 mr-2' />
-                      Mùa lý tưởng
-                    </span>
-                    <span className='font-semibold text-gray-800'>
-                      Quanh năm
-                    </span>
-                  </div>
 
                   <div className='bg-gray-50 p-4 rounded-xl'>
                     <div className='text-sm text-gray-600 mb-2 flex items-center'>

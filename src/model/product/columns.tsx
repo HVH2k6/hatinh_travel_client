@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
-import { Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Pencil, Trash2, Loader2, Eye } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { HandleDeleteAttraction } from '@/action/HandleAttraction';
 
@@ -50,6 +50,18 @@ function ActionsCell({ id }: { id: string }) {
 
   return (
     <div className='flex gap-2'>
+      
+      <Button
+        asChild
+        variant='outline'
+        size='icon'
+        className='text-blue-600 hover:text-blue-800 border-blue-200'
+        aria-label='Đánh giá sản phẩm'
+      >
+        <Link href={`/quan-ly-cua-hang/san-pham/${id}/danh-gia`}>
+          <Eye className='w-4 h-4' />
+        </Link>
+      </Button>
       <Button
         asChild
         variant='outline'
