@@ -55,10 +55,7 @@ export function LoginForm() {
 
   const handleGoogleLogin = async () => {
     try {
-      setGoogleLoading(true);
-      // TODO: thay đường dẫn theo backend OAuth của bạn
-      // ví dụ: window.location.href = '/api/auth/google';
-      window.location.href = '/api/auth/google';
+      toast.info("Tính năng đang được phát triển")
     } finally {
       // không set false để tránh user click tiếp trong lúc redirect
     }
