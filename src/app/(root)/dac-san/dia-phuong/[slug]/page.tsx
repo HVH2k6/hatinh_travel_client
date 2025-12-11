@@ -10,7 +10,8 @@ async function fetchFood(slug: string): Promise<IFood[] | null> {
     next: { revalidate: 60 }, // hoặc cache: 'no-store' nếu cần
   })
   if (!res.ok) return null
-  return res.json()
+  const data = await res.json()
+  return data.data
 }
 
 export default async function Page({
