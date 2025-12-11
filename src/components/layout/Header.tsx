@@ -84,7 +84,7 @@ export default function Header({ wards }: { wards: IWards[] }) {
     e.preventDefault();
     const qq = q.trim();
     if (!qq) return;
-    router.push(`/tim-kiem?q=${encodeURIComponent(qq)}`);
+    // router.push(`/tim-kiem?q=${encodeURIComponent(qq)}`);
     setShowMobileSearch(false); // Tắt search mobile sau khi tìm
     setQ('');
   };
@@ -118,7 +118,6 @@ export default function Header({ wards }: { wards: IWards[] }) {
           </nav>
         </div>
 
-        {/* --- CENTER: Desktop Search --- */}
         <form
           role='search'
           onSubmit={onSearch}

@@ -66,7 +66,7 @@ const milestonesWithImages = [
     year: '2020 - Nay',
     title: 'Phát Triển Du Lịch Xanh & Đa Trải Nghiệm',
     description:
-      'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn QG Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
+      'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn Quốc gia Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
     image:
       'https://res.cloudinary.com/dpciotkix/image/upload/v1765463739/du-lich-ha-tinh-cam-nang-du-lich-va-22-dia-diem-dep-hap-dan-du-khach-202308091618134333_ormlyw.jpg',
     icon: Mountain,
