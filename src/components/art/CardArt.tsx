@@ -14,7 +14,7 @@ export default function CardArt({ art }: Props) {
 
   // Xử lý địa chỉ: Chỉ lấy Quận/Huyện, Tỉnh
   const location =
-    [address?.districtId?.name, address?.provinceId?.name]
+    [address?.wardId?.name, address?.provinceId?.name]
       .filter(Boolean)
       .join(', ') || 'Đang cập nhật';
 

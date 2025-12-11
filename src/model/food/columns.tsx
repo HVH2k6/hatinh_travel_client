@@ -134,7 +134,7 @@ export const columns: ColumnDef<IFood>[] = [
         <div className='text-sm max-w-xs'>
           <div>{address?.wardId?.name || ''}</div>
           <div className='text-muted-foreground text-xs'>
-            {address?.districtId?.name || ''}, {address?.provinceId?.name || ''}
+             {address?.provinceId?.name || ''}
           </div>
         </div>
       );

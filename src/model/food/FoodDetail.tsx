@@ -19,7 +19,7 @@ export default function FoodDetail({ food, isLoading }: IFoodDetailProps) {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const address =
-    `${food.address.detail && food.address.detail + ', '} ${food.address.wardId.name}, ${food.address.districtId.name}, ${food.address.provinceId.name}`;
+    `${food.address.detail && food.address.detail + ', '} ${food.address.wardId.name},  ${food.address.provinceId.name}`;
 
   const allImages = [food.image, ...food.list_image];
   const price = Number(food.price || 0);

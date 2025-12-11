@@ -17,7 +17,7 @@ import { InputSelectCategory } from '@/components/input/InputSelectCategory';
 import { InputSelectedType } from '@/components/input/InputSelectedType';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 import RichText from '@/components/editor/RichText';
@@ -25,6 +25,7 @@ import RichText from '@/components/editor/RichText';
 import { STATUS, getProvinces } from '@/util/constant';
 import { useCheckAuth } from '@/components/auth/checkauth';
 import { toast } from 'react-toastify';
+import { HandleCreateAttraction } from '@/action/HandleAttraction';
 
 /* ============================ TIME SELECT ============================ */
 
@@ -118,12 +119,15 @@ export const formSchema = z
     description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
     categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
     typeId: z.string().min(1, { message: 'Vui lòng chọn loại địa điểm.' }),
+    
+    // --- SỬA ADDRESS: BỎ DISTRICT ---
     address: z.object({
       provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-      districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
+      // districtId: z.string().min(1, ...), -> ĐÃ XÓA
       wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
       detail: z.string().optional(),
     }),
+
     status: z.enum([STATUS.ACTIVE, STATUS.PENDING, STATUS.DELETED], {
       required_error: 'Vui lòng chọn trạng thái.',
     }),
@@ -164,11 +168,10 @@ export const formSchema = z
   });
 
 type FormType = z.infer<typeof formSchema>;
-type Labels = { categoryName: string; typeName: string; provinceName: string; districtName: string; wardName: string };
+// Bỏ districtName
+type Labels = { categoryName: string; typeName: string; provinceName: string; wardName: string };
 
 /* ============================ COMPONENT ============================ */
-
-import { HandleCreateAttraction } from '@/action/HandleAttraction';
 
 const CreateAttraction = () => {
   const [free, setFree] = useState(false);
@@ -180,7 +183,6 @@ const CreateAttraction = () => {
     categoryName: '',
     typeName: '',
     provinceName: '',
-    districtName: '',
     wardName: '',
   });
 
@@ -193,18 +195,27 @@ const CreateAttraction = () => {
       description: '',
       categoryId: '',
       typeId: '',
-      address: { provinceId: '', districtId: '', wardId: '', detail: '' },
+      // Bỏ districtId trong defaultValues
+      address: { provinceId: '', wardId: '', detail: '' },
       status: STATUS.ACTIVE,
       isFree: false,
       minPrice: 0,
       maxPrice: 0,
-      openTime: '', // để trống -> backend tự default nếu muốn
+      openTime: '',
       closeTime: '',
       createdBy: user?._id,
     },
   });
 
-  const districtId = form.watch('address.districtId');
+  // Watch provinceId để lấy Code
+  const selectedProvinceId = form.watch('address.provinceId');
+  
+  // Tính toán Province Code để truyền vào Ward Component
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
 
   /* ---------- Effects ---------- */
   useEffect(() => {
@@ -212,12 +223,18 @@ const CreateAttraction = () => {
       const result = await getProvinces();
       setProvinces(result || []);
       if (result?.length) {
+        // Mặc định chọn tỉnh đầu tiên
         form.setValue('address.provinceId', result[0]._id);
         setLabels((s) => ({ ...s, provinceName: result[0].name || '' }));
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reset Ward khi đổi Tỉnh (để tránh ID xã cũ của tỉnh khác)
+  useEffect(() => {
+      form.setValue('address.wardId', '');
+  }, [selectedProvinceId, form]);
 
   const listStatus = useMemo(
     () => [
@@ -231,12 +248,13 @@ const CreateAttraction = () => {
   /* ---------- AI helper ---------- */
   async function generateAiDescriptionStrict(v: FormType, lbls: Labels) {
     const provinceName = provinces.find((p) => p._id === v.address?.provinceId)?.name || lbls.provinceName || '';
+    
+    // Payload mới không còn District
     const payload = {
       name: v.name,
       categoryName: lbls.categoryName,
       typeName: lbls.typeName,
       provinceName,
-      districtName: lbls.districtName,
       wardName: lbls.wardName,
       addressDetail: v.address?.detail || '',
       isFree: v.isFree,
@@ -282,7 +300,8 @@ const CreateAttraction = () => {
         description: '',
         categoryId: '',
         typeId: '',
-        address: { provinceId: form.getValues('address.provinceId') || '', districtId: '', wardId: '', detail: '' },
+        // Reset address sạch sẽ
+        address: { provinceId: form.getValues('address.provinceId') || '', wardId: '', detail: '' },
         status: STATUS.ACTIVE,
         isFree: false,
         minPrice: 0,
@@ -445,22 +464,32 @@ const CreateAttraction = () => {
               </div>
             </section>
 
-            {/* 5) Địa chỉ */}
+            {/* 5) Địa chỉ (CẬP NHẬT) */}
             <section className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-sm">5</span>
                 <h3 className="text-base font-semibold">Địa chỉ</h3>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <Label className="block mb-2">Tỉnh</Label>
                   <Input
                     disabled
                     value={provinces.find((p) => p._id === form.watch('address.provinceId'))?.name || ''}
                   />
+                  {/* Nếu muốn input cho phép chọn tỉnh, hãy dùng Select Component thay vì Input disabled */}
                 </div>
-                <InputSelectDistrict control={form.control} name="address.districtId" label="Huyện" />
-                <InputSelectWard control={form.control} name="address.wardId" label="Xã/Phường" districtId={districtId} />
+
+                {/* Đã xóa InputSelectDistrict */}
+                
+                {/* InputSelectWard giờ nhận provinceCode */}
+                <InputSelectWard 
+                    control={form.control} 
+                    name="address.wardId" 
+                    label="Xã/Phường" 
+                    provinceCode={selectedProvinceCode} 
+                />
+
                 <InputForm control={form.control} name="address.detail" label="Địa chỉ chi tiết" placeholder="VD: Thôn 3, xã ABC" />
               </div>
             </section>

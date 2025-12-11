@@ -75,7 +75,7 @@ export default function ListShopRegister({ data }: Props) {
         const location =
           [
             address?.wardId?.name,
-            address?.districtId?.name,
+            
             address?.provinceId?.name,
           ]
             .filter(Boolean)

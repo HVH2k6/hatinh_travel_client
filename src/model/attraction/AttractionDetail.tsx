@@ -153,7 +153,7 @@ function buildAddressString(a: IAttraction['address']): string {
   return [
     a?.detail,
     (a?.wardId as Named)?.name,
-    (a?.districtId as Named)?.name,
+    
     (a?.provinceId as Named)?.name,
   ]
     .filter(Boolean)

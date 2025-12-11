@@ -1,18 +1,11 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import {
-  Save,
-  Image as ImageIcon,
-  MapPin,
-  Info,
-  ChefHat,
-  ArrowLeft,
-} from 'lucide-react';
+import { Image as ImageIcon, MapPin, Info, ArrowLeft } from 'lucide-react';
 
 import { Form } from '@/components/ui/form';
 import {
@@ -22,21 +15,22 @@ import {
   CardContent,
   CardDescription,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 import { InputForm } from '@/components/input/InputForm';
 import { Label } from '@/components/ui/label';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
 import { InputPrice } from '@/components/input/InputPrice';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import { Input } from '@/components/ui/input';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getProvinces } from '@/util/constant';
 import { Button } from '@/components/ui/button';
 import { HandleCreateFood } from '@/action/HandleFood';
+import RichText from '@/components/editor/RichText';
 
+/* ====================== SCHEMA (Đã bỏ districtId) ====================== */
 const schema = z.object({
   name: z.string().min(2, 'Tên tối thiểu 2 ký tự'),
   description: z.string().optional(),
@@ -46,13 +40,16 @@ const schema = z.object({
   price: z
     .number({ required_error: 'Vui lòng nhập giá.' })
     .nonnegative({ message: 'Giá không được âm.' }),
+
+  // Address Schema mới
   address: z.object({
     provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-    districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
+    // districtId: ... -> ĐÃ XÓA
     wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
     detail: z.string().optional(),
   }),
 });
+
 type FormType = z.infer<typeof schema>;
 
 export default function CreateFood() {
@@ -68,10 +65,20 @@ export default function CreateFood() {
       list_image: [],
       ingredients: '',
       price: 0,
-      address: { provinceId: '', districtId: '', wardId: '', detail: '' },
+      // Bỏ districtId trong defaultValues
+      address: { provinceId: '', wardId: '', detail: '' },
     },
   });
-  const districtId = form.watch('address.districtId');
+
+  // 1. Watch provinceId
+  const selectedProvinceId = form.watch('address.provinceId');
+
+  // 2. Tính toán Province Code để truyền vào Ward Component
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
 
   /* ---------- Effects ---------- */
   useEffect(() => {
@@ -79,6 +86,7 @@ export default function CreateFood() {
       const result = await getProvinces();
       setProvinces(result || []);
       if (result?.length) {
+        // Mặc định chọn Tỉnh đầu tiên
         form.setValue('address.provinceId', result[0]._id);
       }
     })();
@@ -100,9 +108,9 @@ export default function CreateFood() {
     <div className='max-w-6xl mx-auto py-8 px-4'>
       {/* Header Page */}
       <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8'>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-             <ArrowLeft className="w-5 h-5" />
+        <div className='flex items-center gap-2'>
+          <Button variant='ghost' size='icon' onClick={() => router.back()}>
+            <ArrowLeft className='w-5 h-5' />
           </Button>
           <div>
             <h1 className='text-2xl sm:text-3xl font-bold tracking-tight text-gray-900'>
@@ -113,23 +121,22 @@ export default function CreateFood() {
             </p>
           </div>
         </div>
-        <div className="hidden sm:block">
-           {/* Nút Cancel hoặc Save Draft nếu cần */}
+        <div className='hidden sm:block'>
+          {/* Nút Cancel hoặc Save Draft nếu cần */}
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-            
             {/* --- CỘT TRÁI: NỘI DUNG CHÍNH (Chiếm 2 phần) --- */}
             <div className='lg:col-span-2 space-y-6'>
-              
               {/* Block 1: Thông tin cơ bản */}
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center text-lg'>
-                    <Info className='w-5 h-5 mr-2 text-blue-600' /> Thông tin chi tiết
+                    <Info className='w-5 h-5 mr-2 text-blue-600' /> Thông tin
+                    chi tiết
                   </CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-5'>
@@ -154,14 +161,27 @@ export default function CreateFood() {
                       placeholder='Lạc, mật mía, gừng...'
                     />
                   </div>
-
-                  <InputForm
-                    control={form.control}
-                    name='description'
-                    label='Mô tả / Câu chuyện món ăn'
-                    placeholder='Giới thiệu về nguồn gốc, hương vị đặc trưng...'
-                    // type="textarea" // Nếu InputForm hỗ trợ
-                  />
+                  <div className='space-y-2'>
+                    <Label className='sr-only'>Mô tả</Label>
+                    <Controller
+                      control={form.control}
+                      name='description'
+                      render={({ field, fieldState }) => (
+                        <div className='prose-editor'>
+                          <RichText
+                            value={field.value}
+                            onChange={(html) => field.onChange(html)}
+                            placeholder='Mô tả'
+                          />
+                          {fieldState.error?.message && (
+                            <p className='text-sm text-red-500 mt-2 bg-red-50 p-2 rounded border border-red-200 inline-block'>
+                              {fieldState.error.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
@@ -169,7 +189,8 @@ export default function CreateFood() {
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center text-lg'>
-                    <ImageIcon className='w-5 h-5 mr-2 text-purple-600' /> Hình ảnh
+                    <ImageIcon className='w-5 h-5 mr-2 text-purple-600' /> Hình
+                    ảnh
                   </CardTitle>
                   <CardDescription>
                     Hình ảnh chất lượng cao giúp món ăn hấp dẫn hơn.
@@ -177,8 +198,8 @@ export default function CreateFood() {
                 </CardHeader>
                 <CardContent className='space-y-6'>
                   {/* Ảnh đại diện */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="sm:col-span-1">
+                  <div className='grid grid-cols-1 sm:grid-cols-3 gap-6'>
+                    <div className='sm:col-span-1'>
                       <Label className='mb-2 block font-semibold text-sm'>
                         Ảnh đại diện *
                       </Label>
@@ -187,8 +208,8 @@ export default function CreateFood() {
                         name='image'
                       />
                     </div>
-                    <div className="sm:col-span-2">
-                       <Label className='mb-2 block font-semibold text-sm'>
+                    <div className='sm:col-span-2'>
+                      <Label className='mb-2 block font-semibold text-sm'>
                         Bộ sưu tập ảnh
                       </Label>
                       <InputUploadMultipleFiles
@@ -203,23 +224,22 @@ export default function CreateFood() {
 
             {/* --- CỘT PHẢI: SETTINGS & SUBMIT (Chiếm 1 phần) --- */}
             <div className='lg:col-span-1'>
-              <div className="sticky top-6 space-y-6">
-                
+              <div className='sticky top-6 space-y-6'>
                 {/* Block 3: Địa điểm */}
                 <Card>
-                  <CardHeader className="bg-slate-50 border-b pb-4">
+                  <CardHeader className='bg-slate-50 border-b pb-4'>
                     <CardTitle className='flex items-center text-lg'>
                       <MapPin className='w-5 h-5 mr-2 text-red-600' /> Khu vực
                     </CardTitle>
                   </CardHeader>
                   <CardContent className='space-y-4 pt-6'>
-                    
-                    {/* Tỉnh (Readonly) */}
                     <div>
-                      <Label className='block mb-2 text-xs uppercase text-gray-500 font-bold'>Tỉnh / Thành phố</Label>
+                      <Label className='block mb-2 text-xs uppercase text-gray-500 font-bold'>
+                        Tỉnh / Thành phố
+                      </Label>
                       <Input
                         disabled
-                        className="bg-slate-100 font-medium text-slate-700"
+                        className='bg-slate-100 font-medium text-slate-700'
                         value={
                           provinces.find(
                             (p) => p._id === form.watch('address.provinceId')
@@ -228,19 +248,14 @@ export default function CreateFood() {
                       />
                     </div>
 
-                    {/* Huyện */}
-                    <InputSelectDistrict
-                      control={form.control}
-                      name='address.districtId'
-                      label='Quận / Huyện'
-                    />
+                    {/* Đã xóa InputSelectDistrict */}
 
-                    {/* Xã */}
+                    {/* Xã: Truyền provinceCode vào đây */}
                     <InputSelectWard
                       control={form.control}
                       name='address.wardId'
                       label='Phường / Xã'
-                      districtId={districtId}
+                      provinceCode={selectedProvinceCode}
                     />
 
                     {/* Chi tiết */}
@@ -254,18 +269,14 @@ export default function CreateFood() {
                 </Card>
 
                 {/* Block 4: Submit Action */}
-                <Card className="border-none shadow-none bg-transparent">
-                   <ButtonSubmit
+                <Card className='border-none shadow-none bg-transparent'>
+                  <ButtonSubmit
                     isLoading={form.formState.isSubmitting}
                     text='Hoàn tất & Đăng bài'
-                    // icon={<Save className="w-4 h-4 mr-2" />}
-                    // className="w-full py-6 text-lg shadow-lg hover:scale-[1.02] transition-transform"
                   />
                 </Card>
-
               </div>
             </div>
-
           </div>
         </form>
       </Form>

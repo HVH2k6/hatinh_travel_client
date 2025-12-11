@@ -28,7 +28,7 @@ api.interceptors.response.use(
         if (!refresh_token) {
           clearTokens();
           // ❌ KHÔNG redirect ở đây
-          return Promise.reject(new Error('Missing refresh token'));
+          return Promise.reject(new Error('Tài khoản hoặc mật khẩu không đúng'));
         }
 
         const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/renew-access-token`, {

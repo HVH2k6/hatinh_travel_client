@@ -1,10 +1,11 @@
 import { IUser } from './IUser';
 import { ICategory } from './ICategory';
-import { IDistricts, IProvinces, IWards } from './IAddress';
+
 import { IShop } from './IShop';
+import { IProvinces, IWards } from './IAddress';
 interface Address {
   provinceId: IProvinces; // nếu có thể nhận _id thuần: IProvinces | string
-  districtId: IDistricts;
+  
   wardId: IWards;
   detail?: string;
 }

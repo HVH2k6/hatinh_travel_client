@@ -6,13 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import {
-  Save,
   Image as ImageIcon,
   MapPin,
   Info,
-  ChefHat,
   ArrowLeft,
 } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
 
 import { Form } from '@/components/ui/form';
 import {
@@ -20,25 +19,23 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 import { InputForm } from '@/components/input/InputForm';
 import { Label } from '@/components/ui/label';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
 import { InputPrice } from '@/components/input/InputPrice';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import { Input } from '@/components/ui/input';
-import { useEffect, useState } from 'react';
 import { getProvinces } from '@/util/constant';
 import { Button } from '@/components/ui/button';
-import { HandleCreateFood, HandleUpdateFood } from '@/action/HandleFood';
+import { HandleUpdateFood } from '@/action/HandleFood';
 import { IFood } from '@/interfaces/IFood';
 import RichText from '@/components/editor/RichText';
 
+/* ====================== SCHEMA (Đã bỏ districtId) ====================== */
 const schema = z.object({
   name: z.string().min(2, 'Tên tối thiểu 2 ký tự'),
   description: z.string().optional(),
@@ -48,17 +45,22 @@ const schema = z.object({
   price: z
     .number({ required_error: 'Vui lòng nhập giá.' })
     .nonnegative({ message: 'Giá không được âm.' }),
+  
+  // Address Schema mới
   address: z.object({
     provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-    districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
+    // districtId: ... -> ĐÃ XÓA
     wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
     detail: z.string().optional(),
   }),
 });
+
 type FormType = z.infer<typeof schema>;
+
 interface Props {
   data: IFood;
 }
+
 export default function UpdateFood({ data }: Props) {
   const router = useRouter();
   const [provinces, setProvinces] = useState<any[]>([]);
@@ -72,22 +74,34 @@ export default function UpdateFood({ data }: Props) {
       list_image: Array.isArray(data?.list_image) ? data.list_image : [],
       ingredients: data.ingredients || '',
       price: data.price || 0,
+      // Mapping lại address (Bỏ District)
       address: {
         provinceId: (data as any)?.address?.provinceId?._id ?? '',
-        districtId: (data as any)?.address?.districtId?._id ?? '',
         wardId: (data as any)?.address?.wardId?._id ?? '',
         detail: (data as any)?.address?.detail ?? '',
       },
     },
   });
-  const districtId = form.watch('address.districtId');
+
+  // 1. Watch provinceId
+  const selectedProvinceId = form.watch('address.provinceId');
+
+  // 2. Tính toán Province Code để truyền vào Ward Component
+  // (Lưu ý: API getWards cần code số (VD: 42) chứ không phải ID string)
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
 
   /* ---------- Effects ---------- */
   useEffect(() => {
     (async () => {
       const result = await getProvinces();
       setProvinces(result || []);
-      if (result?.length) {
+      // Logic cũ: nếu chưa có province thì set cái đầu.
+      // Nhưng đây là Update, data đã có sẵn provinceId từ defaultValues rồi.
+      if (!form.getValues('address.provinceId') && result?.length) {
         form.setValue('address.provinceId', result[0]._id);
       }
     })();
@@ -101,7 +115,7 @@ export default function UpdateFood({ data }: Props) {
       router.push('/quan-ly/dac-san');
       router.refresh();
     } catch (e: any) {
-      toast.error(e?.message || 'Tạo thất bại');
+      toast.error(e?.message || 'Cập nhật thất bại');
     }
   };
 
@@ -115,29 +129,27 @@ export default function UpdateFood({ data }: Props) {
           </Button>
           <div>
             <h1 className='text-2xl sm:text-3xl font-bold tracking-tight text-gray-900'>
-              Thêm mới Đặc sản
+              Cập nhật Đặc sản
             </h1>
             <p className='text-sm text-gray-500 mt-1'>
-              Điền thông tin chi tiết để đăng tải món ăn đặc sản địa phương.
+              Chỉnh sửa thông tin chi tiết của món ăn.
             </p>
           </div>
-        </div>
-        <div className='hidden sm:block'>
-          {/* Nút Cancel hoặc Save Draft nếu cần */}
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+            
             {/* --- CỘT TRÁI: NỘI DUNG CHÍNH (Chiếm 2 phần) --- */}
             <div className='lg:col-span-2 space-y-6'>
+              
               {/* Block 1: Thông tin cơ bản */}
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center text-lg'>
-                    <Info className='w-5 h-5 mr-2 text-blue-600' /> Thông tin
-                    chi tiết
+                    <Info className='w-5 h-5 mr-2 text-blue-600' /> Thông tin chi tiết
                   </CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-5'>
@@ -163,7 +175,6 @@ export default function UpdateFood({ data }: Props) {
                     />
                   </div>
 
-                      
                   <div className="space-y-2">
                     <Label>Mô tả chi tiết</Label>
                     <Controller
@@ -183,7 +194,6 @@ export default function UpdateFood({ data }: Props) {
                       )}
                     />
                   </div>
-                  
                 </CardContent>
               </Card>
 
@@ -191,15 +201,10 @@ export default function UpdateFood({ data }: Props) {
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center text-lg'>
-                    <ImageIcon className='w-5 h-5 mr-2 text-purple-600' /> Hình
-                    ảnh
+                    <ImageIcon className='w-5 h-5 mr-2 text-purple-600' /> Hình ảnh
                   </CardTitle>
-                  <CardDescription>
-                    Hình ảnh chất lượng cao giúp món ăn hấp dẫn hơn.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className='space-y-6'>
-                  {/* Ảnh đại diện */}
                   <div className='grid grid-cols-1 sm:grid-cols-3 gap-6'>
                     <div className='sm:col-span-1'>
                       <Label className='mb-2 block font-semibold text-sm'>
@@ -227,6 +232,7 @@ export default function UpdateFood({ data }: Props) {
             {/* --- CỘT PHẢI: SETTINGS & SUBMIT (Chiếm 1 phần) --- */}
             <div className='lg:col-span-1'>
               <div className='sticky top-6 space-y-6'>
+                
                 {/* Block 3: Địa điểm */}
                 <Card>
                   <CardHeader className='bg-slate-50 border-b pb-4'>
@@ -235,7 +241,8 @@ export default function UpdateFood({ data }: Props) {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className='space-y-4 pt-6'>
-                    {/* Tỉnh (Readonly) */}
+                    
+                    {/* Tỉnh (Readonly - hoặc Select disable nếu muốn) */}
                     <div>
                       <Label className='block mb-2 text-xs uppercase text-gray-500 font-bold'>
                         Tỉnh / Thành phố
@@ -246,24 +253,19 @@ export default function UpdateFood({ data }: Props) {
                         value={
                           provinces.find(
                             (p) => p._id === form.watch('address.provinceId')
-                          )?.name || 'Hà Tĩnh'
+                          )?.name || 'Đang tải...'
                         }
                       />
                     </div>
 
-                    {/* Huyện */}
-                    <InputSelectDistrict
-                      control={form.control}
-                      name='address.districtId'
-                      label='Quận / Huyện'
-                    />
+                    {/* Đã xóa InputSelectDistrict */}
 
-                    {/* Xã */}
+                    {/* Xã: Truyền provinceCode */}
                     <InputSelectWard
                       control={form.control}
                       name='address.wardId'
                       label='Phường / Xã'
-                      districtId={districtId}
+                      provinceCode={selectedProvinceCode}
                     />
 
                     {/* Chi tiết */}
@@ -280,9 +282,7 @@ export default function UpdateFood({ data }: Props) {
                 <Card className='border-none shadow-none bg-transparent'>
                   <ButtonSubmit
                     isLoading={form.formState.isSubmitting}
-                    text='Hoàn tất & Đăng bài'
-                    // icon={<Save className="w-4 h-4 mr-2" />}
-                    // className="w-full py-6 text-lg shadow-lg hover:scale-[1.02] transition-transform"
+                    text='Cập nhật món ăn'
                   />
                 </Card>
               </div>

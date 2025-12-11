@@ -122,6 +122,17 @@ export const columns: ColumnDef<IArt>[] = [
   {
     accessorKey: 'video_url',
     header: 'Link',
+    cell: ({ row }) => {
+      return (
+        <Link
+          href={(row.original as any)?.video_url}
+          target='_blank'
+          className='text-blue-600 hover:text-blue-800'
+        >
+          {((row.original as any)?.video_url).slice(0, 50) + '...'}
+        </Link>
+      )
+    }
    
   },
   {
@@ -133,7 +144,7 @@ export const columns: ColumnDef<IArt>[] = [
         <div className='text-sm max-w-xs'>
           <div>{address?.wardId?.name || ''}</div>
           <div className='text-muted-foreground text-xs'>
-            {address?.districtId?.name || ''}, {address?.provinceId?.name || ''}
+            {address?.provinceId?.name || ''}
           </div>
         </div>
       );

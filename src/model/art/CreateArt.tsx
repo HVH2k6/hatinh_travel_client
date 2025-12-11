@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useEffect, useState, useMemo } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 import { Form } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -17,27 +18,30 @@ import { InputForm } from '@/components/input/InputForm';
 import { InputSelectCategory } from '@/components/input/InputSelectCategory';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+
+// Component chọn xã (đã sửa ở các bước trước)
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 import RichText from '@/components/editor/RichText';
 
 import { getProvinces } from '@/util/constant';
 import { HandleCreateArt } from '@/action/HandleArt';
-import { MapPin, Image as ImageIcon, Info, FileText } from 'lucide-react'; // Icon cho đẹp
+import { MapPin, Image as ImageIcon, Info, FileText, ArrowLeft } from 'lucide-react';
 
 /* ============================ SCHEMA ============================ */
 export const formSchema = z.object({
   name: z.string().min(5, { message: 'Tên địa điểm phải từ 5 ký tự trở lên.' }),
   image: z.string().url({ message: 'Vui lòng chọn hình ảnh hợp lệ (dạng URL).' }),
   list_image: z
-    .array(z.string().url({ message: 'Mỗi hình ảnh phải là một URL hợp lệ.' })).optional(),
+    .array(z.string().url({ message: 'Mỗi hình ảnh phải là một URL hợp lệ.' }))
+    .optional(),
   description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
   categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
   video_url: z.string().optional(),
+  
+  // Address Schema: Bỏ districtId
   address: z.object({
     provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-    districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
     wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
     detail: z.string().optional(),
   }),
@@ -47,6 +51,7 @@ type FormType = z.infer<typeof formSchema>;
 
 /* ============================ COMPONENT ============================ */
 const CreateArt = () => {
+  const router = useRouter();
   const [provinces, setProvinces] = useState<any[]>([]);
 
   const form = useForm<FormType>({
@@ -58,11 +63,19 @@ const CreateArt = () => {
       description: '',
       categoryId: '',
       video_url: '',
-      address: { provinceId: '', districtId: '', wardId: '', detail: '' },
+      address: { provinceId: '', wardId: '', detail: '' },
     },
   });
 
-  const districtId = form.watch('address.districtId');
+  // 1. Watch provinceId
+  const selectedProvinceId = form.watch('address.provinceId');
+
+  // 2. Tính toán Province Code (Số 42) từ ID (String)
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
 
   /* ---------- Effects ---------- */
   useEffect(() => {
@@ -70,6 +83,7 @@ const CreateArt = () => {
       const result = await getProvinces();
       setProvinces(result || []);
       if (result?.length) {
+        // Mặc định chọn tỉnh đầu tiên (Hà Tĩnh)
         form.setValue('address.provinceId', result[0]._id);
       }
     })();
@@ -81,22 +95,11 @@ const CreateArt = () => {
     const ok = await HandleCreateArt(payload as any);
     if (ok) {
       toast.success('Tạo thành công');
-      form.reset({
-        name: '',
-        image: '',
-        list_image: [],
-        description: '',
-        categoryId: '',
-        video_url: '',
-        address: {
-          provinceId: form.getValues('address.provinceId') || '',
-          districtId: '',
-          wardId: '',
-          detail: '',
-        },
-      });
+      router.push('/quan-ly/van-hoa-nghe-thuat'); // Redirect sau khi tạo
+      router.refresh();
     }
   };
+
   const handleError = (e: any) => console.log(e);
 
   /* ---------- UI Sections Helper ---------- */
@@ -111,6 +114,13 @@ const CreateArt = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4">
+      {/* Header Back Button */}
+      <div className="mb-6">
+        <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 pl-0 hover:bg-transparent hover:underline">
+          <ArrowLeft size={16} /> Quay lại
+        </Button>
+      </div>
+
       <Card className="shadow-lg border-t-4 border-t-primary">
         <CardHeader className="text-center border-b bg-gray-50/50 pb-6">
           <CardTitle className="text-3xl font-bold text-gray-800">Tạo mới Văn hóa & Nghệ thuật</CardTitle>
@@ -160,7 +170,7 @@ const CreateArt = () => {
 
               <Separator />
 
-              {/* PHẦN 2: VỊ TRÍ (Đẩy lên trước Media cho flow hợp lý hơn: Tên -> Ở đâu -> Ảnh -> Chi tiết) */}
+              {/* PHẦN 2: VỊ TRÍ */}
               <section>
                 <SectionHeader icon={MapPin} title="Địa chỉ & Vị trí" />
                 <div className="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300">
@@ -178,19 +188,12 @@ const CreateArt = () => {
                       />
                     </div>
 
-                    {/* Huyện */}
-                    <InputSelectDistrict
-                      control={form.control}
-                      name="address.districtId"
-                      label="Quận / Huyện"
-                    />
-
-                    {/* Xã */}
+                    {/* Xã: Truyền selectedProvinceCode vào đây */}
                     <InputSelectWard
                       control={form.control}
                       name="address.wardId"
                       label="Phường / Xã"
-                      districtId={districtId}
+                      provinceCode={selectedProvinceCode} 
                     />
 
                     {/* Chi tiết */}
@@ -260,18 +263,17 @@ const CreateArt = () => {
               {/* FOOTER ACTIONS */}
               <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 pt-6 border-t mt-8">
                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full sm:w-auto"
-                    onClick={() => window.history.back()}
+                   type="button" 
+                   variant="outline" 
+                   className="w-full sm:w-auto"
+                   onClick={() => router.back()}
                  >
-                    Hủy bỏ
+                   Hủy bỏ
                  </Button>
                  <div className="w-full sm:w-auto">
                     <ButtonSubmit
                       isLoading={form.formState.isSubmitting}
                       text="Đăng bài ngay"
-                    //   className="w-full sm:w-min min-w-[150px]"
                     />
                  </div>
               </div>

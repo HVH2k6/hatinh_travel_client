@@ -85,7 +85,7 @@ export default function ArtDetail({ data, isLoading }: Props) {
     [
       data.address.detail,
       data.address.wardId?.name,
-      data.address.districtId?.name,
+      
       data.address.provinceId?.name,
     ]
       .filter(Boolean)

@@ -106,12 +106,12 @@ export default async function ShopDetailPage({ shop }: { shop: IShop }) {
 
   // Helper xử lý địa chỉ
   const provinceName = (shop.address.provinceId as any)?.name || '';
-  const districtName = (shop.address.districtId as any)?.name || '';
+  // const districtName = (shop.address.districtId as any)?.name || '';
   const wardName = (shop.address.wardId as any)?.name || '';
   const fullAddress = [
     shop.address.detail,
     wardName,
-    districtName,
+    // districtName,
     provinceName,
   ]
     .filter(Boolean)
@@ -311,7 +311,7 @@ export default async function ShopDetailPage({ shop }: { shop: IShop }) {
                 <div className='flex items-start gap-3'>
                   <MapPin className='w-5 h-5 text-gray-400 mt-0.5' />
                   <p className='text-sm text-gray-600'>
-                    {wardName}, {districtName},<br />
+                    {wardName},<br />
                     <span className='font-semibold text-gray-900'>
                       {provinceName}
                     </span>

@@ -18,7 +18,7 @@ import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFile
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCheckAuth } from '@/components/auth/checkauth';
 import { Input } from '@/components/ui/input';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import { toast } from 'react-toastify';
 import { HandleUpdateAttraction } from '@/action/HandleAttraction';
@@ -37,79 +37,9 @@ const LoadingSkeleton = () => (
     </CardHeader>
     <CardContent>
       <div className="space-y-8">
-        <section className="space-y-4">
-          <Skeleton className="h-6 w-40" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <Skeleton className="h-4 w-24 mb-2" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div>
-              <Skeleton className="h-4 w-20 mb-2" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div>
-              <Skeleton className="h-4 w-32 mb-2" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          </div>
-        </section>
-        <section className="space-y-4">
-          <Skeleton className="h-6 w-24" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Skeleton className="h-4 w-32 mb-2" />
-              <Skeleton className="h-32 w-full" />
-            </div>
-            <div>
-              <Skeleton className="h-4 w-28 mb-2" />
-              <Skeleton className="h-32 w-full" />
-            </div>
-          </div>
-        </section>
-        <section className="space-y-4">
-          <Skeleton className="h-6 w-32" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Skeleton className="h-4 w-20 mb-2" />
-                <div className="flex gap-4">
-                  <Skeleton className="h-4 w-12" />
-                  <Skeleton className="h-4 w-8" />
-                </div>
-              </div>
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div>
-              <Skeleton className="h-4 w-20 mb-2" />
-              <div className="grid grid-cols-3 gap-2">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-12" />
-              </div>
-            </div>
-          </div>
-        </section>
-        <section className="space-y-4">
-          <Skeleton className="h-6 w-16" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </section>
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-6 w-28" />
-            <Skeleton className="h-8 w-16" />
-          </div>
-          <Skeleton className="h-40 w-full" />
-        </section>
-        <div className="text-center">
-          <Skeleton className="h-10 w-32 mx-auto" />
-        </div>
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-40 w-full" />
       </div>
     </CardContent>
   </Card>
@@ -196,7 +126,7 @@ function TimeSelect({
   );
 }
 
-/* ====================== Schema ====================== */
+/* ====================== Schema (ĐÃ BỎ DISTRICT) ====================== */
 export const formSchema = z
   .object({
     name: z.string().min(5, { message: 'Tên địa điểm phải từ 5 ký tự trở lên.' }),
@@ -207,12 +137,15 @@ export const formSchema = z
     description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
     categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
     typeId: z.string().min(1, { message: 'Vui lòng chọn loại địa điểm.' }),
+    
+    // Schema Address mới
     address: z.object({
       provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-      districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }),
+      // districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }), -> DELETE
       wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
       detail: z.string().optional(),
     }),
+
     status: z.enum([STATUS.ACTIVE, STATUS.PENDING, STATUS.DELETED], {
       required_error: 'Vui lòng chọn trạng thái.',
     }),
@@ -253,7 +186,8 @@ export const formSchema = z
   });
 
 type FormType = z.infer<typeof formSchema>;
-type Labels = { categoryName: string; typeName: string; provinceName: string; districtName: string; wardName: string };
+// Bỏ districtName
+type Labels = { categoryName: string; typeName: string; provinceName: string; wardName: string };
 
 interface IUpdateAttraction {
   data: IAttraction;
@@ -272,7 +206,6 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
     categoryName: data?.categoryId?.name ?? '',
     typeName: data?.typeId?.name ?? '',
     provinceName: (data as any)?.address?.provinceId?.name ?? '',
-    districtName: (data as any)?.address?.districtId?.name ?? '',
     wardName: (data as any)?.address?.wardId?.name ?? '',
   });
 
@@ -284,9 +217,10 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
       description: data?.description ?? '',
       categoryId: (data as any)?.categoryId?._id ?? '',
       typeId: (data as any)?.typeId?._id ?? '',
+      // Address Default Values (Bỏ District)
       address: {
         provinceId: (data as any)?.address?.provinceId?._id ?? '',
-        districtId: (data as any)?.address?.districtId?._id ?? '',
+        // districtId: ... -> DELETE
         wardId: (data as any)?.address?.wardId?._id ?? '',
         detail: (data as any)?.address?.detail ?? '',
       },
@@ -297,7 +231,6 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
       isFree: Boolean(data?.isFree),
       minPrice: Number(data?.minPrice ?? 0),
       maxPrice: Number(data?.maxPrice ?? 0),
-      // ⏰ parse từ ISO/Date/HH:mm -> HH:mm
       openTime: toHHmmFromAny((data as any)?.openTime),
       closeTime: toHHmmFromAny((data as any)?.closeTime),
 
@@ -312,13 +245,23 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
   });
 
   const [free, setFree] = useState<boolean>(defaultValues.isFree);
-  const districtId = form.watch('address.districtId');
+  
+  // Watch Province để lấy Code
+  const selectedProvinceId = form.watch('address.provinceId');
+  
+  // Tính toán Province Code
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
 
   useEffect(() => {
     (async () => {
       try {
         const result = await getProvinces();
         setProvinces(result || []);
+        // Nếu data chưa có province, set mặc định cái đầu
         const current = form.getValues('address.provinceId');
         if (!current && result?.length) {
           form.setValue('address.provinceId', result[0]._id);
@@ -340,6 +283,7 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
     []
   );
 
+  // AI Generate (Bỏ districtName)
   async function generateAiDescriptionStrict(v: FormType, lbls: Labels) {
     const provinceName = provinces.find((p) => p._id === v.address?.provinceId)?.name || lbls.provinceName || '';
     const payload = {
@@ -347,7 +291,6 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
       categoryName: lbls.categoryName,
       typeName: lbls.typeName,
       provinceName,
-      districtName: lbls.districtName,
       wardName: lbls.wardName,
       addressDetail: v.address?.detail || '',
       isFree: v.isFree,
@@ -379,7 +322,6 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
 
     const payload: any = {
       ...values,
-      // gửi undefined nếu để trống -> backend bỏ qua/giữ nguyên
       openTime: values.openTime?.trim() ? values.openTime : undefined,
       closeTime: values.closeTime?.trim() ? values.closeTime : undefined,
     };
@@ -536,10 +478,10 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
               </div>
             </section>
 
-            {/* ========== Địa chỉ ========== */}
+            {/* ========== Địa chỉ (CẬP NHẬT) ========== */}
             <section className="space-y-4">
               <h3 className="text-base font-semibold">Địa chỉ</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <Label className="block mb-2">Tỉnh</Label>
                   <Input
@@ -550,9 +492,19 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
                       ''
                     }
                   />
+                  {/* Nếu muốn input cho phép chọn tỉnh, dùng Select Component */}
                 </div>
-                <InputSelectDistrict control={form.control} name="address.districtId" label="Huyện" />
-                <InputSelectWard control={form.control} name="address.wardId" label="Xã/Phường" districtId={districtId} />
+                
+                {/* Đã xóa InputSelectDistrict */}
+
+                {/* InputSelectWard nhận provinceCode */}
+                <InputSelectWard 
+                    control={form.control} 
+                    name="address.wardId" 
+                    label="Xã/Phường" 
+                    provinceCode={selectedProvinceCode} 
+                />
+
                 <InputForm control={form.control} name="address.detail" label="Địa chỉ chi tiết" placeholder="VD: Thôn 3, xã ABC" />
               </div>
             </section>

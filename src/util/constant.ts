@@ -2,6 +2,7 @@ import {
   Cake,
   FileType,
   Map,
+  Music,
   Scale,
   ShoppingBag,
   SquareMenu,
@@ -68,7 +69,7 @@ export const menuSidebarAdmin = [
         url: '/quan-ly/danh-muc',
       },
       {
-        title: 'Tạo mới địa điểm',
+        title: 'Tạo mới danh mục',
         url: '/quan-ly/danh-muc/tao-moi',
       },
     ],
@@ -126,6 +127,24 @@ export const menuSidebarAdmin = [
       {
         title: 'Tạo mới đặc sản',
         url: '/quan-ly/dac-san/tao-moi',
+      },
+    ],
+  },
+   {
+    title: 'Văn hóa nghệ thuật',
+    url: '#',
+    icon: Music,
+    page: 'admin',
+
+    items: [
+      {
+        title: 'Danh sách văn hóa nghệ thuật',
+        url: '/quan-ly/van-hoa-nghe-thuat',
+      },
+   
+      {
+        title: 'Tạo mới văn hóa nghệ thuật',
+        url: '/quan-ly/van-hoa-nghe-thuat/tao-moi',
       },
     ],
   },

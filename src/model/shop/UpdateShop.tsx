@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { InputForm } from '@/components/input/InputForm';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 
@@ -26,17 +26,20 @@ import { IShop } from '@/interfaces/IShop';
 import { HandleUpdateShop } from '@/action/HandleShop';
 import { useRouter } from 'next/navigation';
 
-/* ============================ SCHEMA (chuẩn backend) ============================ */
+/* ============================ SCHEMA (chuẩn backend - Bỏ District) ============================ */
 const formSchema = z.object({
   name: z.string().min(5, { message: 'Tên cửa hàng phải từ 5 ký tự trở lên.' }),
   categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
   image: z.string().url('Ảnh đại diện phải là URL hợp lệ.').optional(),
+  
+  // Address Schema mới
   address: z.object({
     provinceId: z.string().min(1, 'Chọn tỉnh/thành phố.'),
-    districtId: z.string().min(1, 'Chọn quận/huyện.'),
+    // districtId: ... -> ĐÃ XÓA
     wardId: z.string().min(1, 'Chọn phường/xã.'),
     detail: z.string().optional(),
   }),
+
   contact: z
     .object({
       phone: z.string().optional(),
@@ -59,20 +62,18 @@ type Props = {
 
 export default function UpdateShop({ data }: Props) {
   const user = useCheckAuth();
-
+  const router = useRouter();
   const [provinces, setProvinces] = useState<any[]>([]);
-  
 
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: data.name || '',
       categoryId: (data as any)?.categoryId?._id ?? '',
-
       image: data.image || '',
+      // Mapping Address (Bỏ District)
       address: {
         provinceId: (data as any)?.address?.provinceId?._id ?? '',
-        districtId: (data as any)?.address?.districtId?._id ?? '',
         wardId: (data as any)?.address?.wardId?._id ?? '',
         detail: (data as any)?.address?.detail ?? '',
       },
@@ -85,18 +86,25 @@ export default function UpdateShop({ data }: Props) {
     },
   });
 
-  const districtId = form.watch('address.districtId');
+  // 1. Watch provinceId
+  const selectedProvinceId = form.watch('address.provinceId');
 
-  /* ---------- Preload tỉnh + Pre-check pending ---------- */
+  // 2. Tính toán Province Code (Số 42) để truyền vào Ward Component
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
+
+  /* ---------- Preload tỉnh ---------- */
   useEffect(() => {
     (async () => {
       try {
         const result = await getProvinces();
         setProvinces(result || []);
-        if (result?.length) {
-          form.setValue('address.provinceId', result[0]._id, {
-            shouldDirty: true,
-          });
+        // Nếu data cũ chưa có province, set mặc định cái đầu
+        if (!form.getValues('address.provinceId') && result?.length) {
+          form.setValue('address.provinceId', result[0]._id);
         }
       } catch {
         toast.error('Không tải được danh sách tỉnh/thành');
@@ -106,29 +114,14 @@ export default function UpdateShop({ data }: Props) {
   }, []);
 
   /* ---------- Submit ---------- */
-    const router = useRouter();
-  
   const onSubmit = async (values: FormType) => {
     try {
       const payload = { ...values, userId: user?._id };
-        await HandleUpdateShop(payload as any, data._id);
+      await HandleUpdateShop(payload as any, data._id);
 
       toast.success('Cập nhật thành công');
-      
-      form.reset({
-        name: '',
-        categoryId: '',
-        image: '',
-        address: {
-          provinceId: form.getValues('address.provinceId') || '',
-          districtId: '',
-          wardId: '',
-          detail: '',
-        },
-        contact: { phone: '', facebook: '', zalo: '' },
-        documents: [],
-      });
       router.push('/quan-ly-cua-hang');
+      router.refresh();
     } catch (err: any) {
       const msg =
         err?.message ||
@@ -145,7 +138,7 @@ export default function UpdateShop({ data }: Props) {
   return (
     <Card className='max-w-4xl mx-auto mt-6 px-2 sm:px-6 md:px-10'>
       <CardHeader>
-        <CardTitle className='text-2xl text-center'>Caapj nh</CardTitle>
+        <CardTitle className='text-2xl text-center'>Cập nhật Cửa hàng</CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -242,17 +235,17 @@ export default function UpdateShop({ data }: Props) {
                     }
                   />
                 </div>
-                <InputSelectDistrict
-                  control={form.control}
-                  name='address.districtId'
-                  label='Huyện'
-                />
+
+                {/* Đã xóa InputSelectDistrict */}
+
+                {/* Xã: Truyền selectedProvinceCode */}
                 <InputSelectWard
                   control={form.control}
                   name='address.wardId'
                   label='Xã/Phường'
-                  districtId={districtId}
+                  provinceCode={selectedProvinceCode}
                 />
+
                 <InputForm
                   control={form.control}
                   name='address.detail'

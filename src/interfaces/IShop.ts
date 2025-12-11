@@ -1,6 +1,6 @@
 import { ICategory } from "./ICategory";
 import { IUser } from "./IUser";
-import { IProvinces, IDistricts, IWards } from "./IAddress";
+import { IProvinces, IWards } from "./IAddress";
 
 export interface IShop {
   _id: string;
@@ -16,7 +16,7 @@ export interface IShop {
 
   address: {
     provinceId: IProvinces ;
-    districtId: IDistricts ;
+    
     wardId: IWards ;
     detail?: string;
   };

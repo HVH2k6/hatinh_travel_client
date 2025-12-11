@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Search, Globe, Check, Loader2, User, X } from 'lucide-react'; // Thêm icon X và User
 
-import { IDistricts } from '@/interfaces/IAddress';
+import {  IWards } from '@/interfaces/IAddress';
 import { AuthDropdown } from '@/components/auth/AuthDropdown';
 import { useAuthState } from '@/components/auth/checkauth';
 import HeaderUserSkeleton from '../auth/Skeleton';
@@ -32,7 +32,7 @@ type MenuItem = {
   children?: { title: string; url: string }[];
 };
 
-export default function Header({ districts }: { districts: IDistricts[] }) {
+export default function Header({ wards }: { wards: IWards[] }) {
   const router = useRouter();
   const { user, loading } = useAuthState();
   const [q, setQ] = useState('');
@@ -48,30 +48,30 @@ export default function Header({ districts }: { districts: IDistricts[] }) {
       {
         title: 'Điểm đến',
         isSubMenu: true,
-        children: districts.map((d) => ({
-          title: d.name,
-          url: `/dia-diem/${d.codename}`,
+        children: wards.map((w) => ({
+          title: w.name,
+          url: `/dia-diem/dia-phuong/${w.codename}`,
         })),
       },
       {
         title: 'Đặc sản',
         isSubMenu: true,
-        children: districts.map((d) => ({
-          title: d.name,
-          url: `/dac-san/${d.codename}`,
+        children: wards.map((w) => ({
+          title: w.name,
+          url: `/dac-san/dia-phuong/${w.codename}`,
         })),
       },
       {
         title: 'Nghệ thuật',
         isSubMenu: true,
-        children: districts.map((d) => ({
-          title: d.name,
-          url: `/nghe-thuat/${d.codename}`,
+        children: wards.map((w) => ({
+          title: w.name,
+          url: `/nghe-thuat/dia-phuong/${w.codename}`,
         })),
       },
       { title: 'Chợ', url: '/kham-pha-cho', isSubMenu: false },
     ],
-    [districts]
+    [wards]
   );
 
   const placeholders = {
@@ -95,7 +95,7 @@ export default function Header({ districts }: { districts: IDistricts[] }) {
         
         {/* --- LEFT: Mobile Menu + Logo --- */}
         <div className='flex items-center gap-2 lg:gap-4'>
-          <MenuMobileHeader districts={districts} />
+          <MenuMobileHeader wards={wards}/>
           
           <Link
             href='/'

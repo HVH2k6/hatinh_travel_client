@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input';
 import { InputForm } from '@/components/input/InputForm';
 import InputUploadSingleFile from '@/components/input/InputUploadSingleFile';
 import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFiles';
-import { InputSelectDistrict } from '@/components/input/InputSelectDistrict';
+
+// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import ButtonSubmit from '@/components/button/ButtonSubmit';
 
@@ -23,7 +24,7 @@ import { toast } from 'react-toastify';
 import { HandleCreateSellerApplication } from '@/action/HandleShop';
 import { InputSelectCategory } from '@/components/input/InputSelectCategory';
 
-/* ============================ SCHEMA (chuẩn backend) ============================ */
+/* ============================ SCHEMA (chuẩn backend - Bỏ District) ============================ */
 const formSchema = z.object({
   shopDraft: z.object({
     name: z
@@ -31,12 +32,15 @@ const formSchema = z.object({
       .min(5, { message: 'Tên cửa hàng phải từ 5 ký tự trở lên.' }),
     categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
     image: z.string().url('Ảnh đại diện phải là URL hợp lệ.').optional(),
+    
+    // Address Schema mới
     address: z.object({
       provinceId: z.string().min(1, 'Chọn tỉnh/thành phố.'),
-      districtId: z.string().min(1, 'Chọn quận/huyện.'),
+      // districtId: ... -> ĐÃ XÓA
       wardId: z.string().min(1, 'Chọn phường/xã.'),
       detail: z.string().optional(),
     }),
+
     contact: z
       .object({
         phone: z.string().optional(),
@@ -70,7 +74,8 @@ export default function RegisterShop() {
         name: '',
         categoryId: '',
         image: '',
-        address: { provinceId: '', districtId: '', wardId: '', detail: '' },
+        // Bỏ districtId trong defaultValues
+        address: { provinceId: '', wardId: '', detail: '' },
         contact: { phone: '', facebook: '', zalo: '' },
         documents: [],
       },
@@ -78,7 +83,15 @@ export default function RegisterShop() {
     },
   });
 
-  const districtId = form.watch('shopDraft.address.districtId');
+  // 1. Watch provinceId
+  const selectedProvinceId = form.watch('shopDraft.address.provinceId');
+
+  // 2. Tính toán Province Code (Số 42) để truyền vào Ward Component
+  const selectedProvinceCode = useMemo(() => {
+    if (!selectedProvinceId || provinces.length === 0) return null;
+    const p = provinces.find((item) => item._id === selectedProvinceId);
+    return p ? p.code : null;
+  }, [selectedProvinceId, provinces]);
 
   /* ---------- Preload tỉnh + Pre-check pending ---------- */
   useEffect(() => {
@@ -137,9 +150,9 @@ export default function RegisterShop() {
           name: '',
           categoryId: '',
           image: '',
+          // Reset address (giữ lại province mặc định nếu cần)
           address: {
             provinceId: form.getValues('shopDraft.address.provinceId') || '',
-            districtId: '',
             wardId: '',
             detail: '',
           },
@@ -272,7 +285,7 @@ export default function RegisterShop() {
                   <h3 className='text-base font-semibold'>Địa chỉ</h3>
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
                   <div>
                     <Label className='block mb-2'>Tỉnh</Label>
                     <Input
@@ -285,17 +298,17 @@ export default function RegisterShop() {
                       }
                     />
                   </div>
-                  <InputSelectDistrict
-                    control={form.control}
-                    name='shopDraft.address.districtId'
-                    label='Huyện'
-                  />
+
+                  {/* Đã xóa InputSelectDistrict */}
+
+                  {/* Xã: Truyền selectedProvinceCode */}
                   <InputSelectWard
                     control={form.control}
                     name='shopDraft.address.wardId'
                     label='Xã/Phường'
-                    districtId={districtId}
+                    provinceCode={selectedProvinceCode} 
                   />
+
                   <InputForm
                     control={form.control}
                     name='shopDraft.address.detail'
