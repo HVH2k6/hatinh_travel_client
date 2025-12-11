@@ -12,7 +12,7 @@ export function mapRawDataToattraction(rawData: any[]): IAttraction [] {
       typeId: item.typeId?._id || '',
       address: {
         provinceId: item.address?.provinceId?.name || '',
-        districtId: item. || '',
+        
         wardId: item.address?.wardId?.name || '',
         detail: item.address?.detail || '',
       },

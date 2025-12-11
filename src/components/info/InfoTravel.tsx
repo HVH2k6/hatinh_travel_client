@@ -68,7 +68,7 @@ const milestonesWithImages = [
     description:
       'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn QG Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
     image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/ep25kbhtvai4xbsugwag.jpg',
+      'https://res.cloudinary.com/dpciotkix/image/upload/v1765463739/du-lich-ha-tinh-cam-nang-du-lich-va-22-dia-diem-dep-hap-dan-du-khach-202308091618134333_ormlyw.jpg',
     icon: Mountain,
   },
 ];
@@ -96,7 +96,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
       <section className='relative w-full h-[90vh] flex items-center justify-center overflow-hidden'>
         <div className='absolute inset-0 z-0'>
           <img
-            src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764818773/zzfpepqrx1sps9f1muk7.jpg'
+            src='https://res.cloudinary.com/dpciotkix/image/upload/v1765463626/i1mages_bf0tri.jpg'
             alt='Ha Tinh Landscape'
             className='w-full h-full object-cover brightness-[0.75]'
             loading='eager'

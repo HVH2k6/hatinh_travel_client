@@ -50,7 +50,7 @@ export default function Header({ wards }: { wards: IWards[] }) {
         isSubMenu: true,
         children: wards.map((w) => ({
           title: w.name,
-          url: `/dia-diem/dia-phuong/${w.codename}`,
+          url: `/dia-diem-du-lich/dia-phuong/${w.codename}`,
         })),
       },
       {
@@ -66,7 +66,7 @@ export default function Header({ wards }: { wards: IWards[] }) {
         isSubMenu: true,
         children: wards.map((w) => ({
           title: w.name,
-          url: `/nghe-thuat/dia-phuong/${w.codename}`,
+          url: `/van-hoa-nghe-thuat/dia-phuong/${w.codename}`,
         })),
       },
       { title: 'Chợ', url: '/kham-pha-cho', isSubMenu: false },
