@@ -1,3 +1,4 @@
+import ListShop from '@/components/shop/Card';
 import ListCard from '@/components/shop/Card';
 
 
@@ -16,7 +17,7 @@ export default async function Page() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Danh sách các chợ</h1>
       {/* Truyền prop 'data' vào ListCard */}
-      <ListCard data={shopsData} />
+      <ListShop data={shopsData} />
     </div>
   );
 }

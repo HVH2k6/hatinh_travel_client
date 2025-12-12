@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ReviewSection from '@/components/review/ReviewSection';
+import ProductCard from '@/components/product/ProductCard';
 
 // --- HELPER FETCH PRODUCTS ---
 async function fetchProductsByShop(shopId: string): Promise<IProduct[]> {
@@ -58,45 +59,7 @@ const Badge = ({
   </span>
 );
 
-const ProductCard = ({ product }: { product: IProduct }) => {
-  return (
-    <div className='group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full'>
-      <div className='relative h-48 w-full overflow-hidden bg-gray-100'>
-        <img
-          src={product.image || '/placeholder-product.jpg'}
-          alt={product.name}
-          className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
-        />
-        <div className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-          <button className='p-2 bg-white rounded-full shadow-md hover:bg-red-50 text-gray-500 hover:text-red-500'>
-            <Heart className='w-4 h-4' />
-          </button>
-        </div>
-      </div>
 
-      <div className='p-4 flex flex-col flex-1'>
-        <h3 className='font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors'>
-          {product.name}
-        </h3>
-
-        <div className='mt-auto pt-3 border-t border-gray-50 flex items-center justify-between'>
-          <span className='text-lg font-bold text-blue-600'>
-            {new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND',
-            }).format(product.price)}
-            /{product.unitId.symbol}
-          </span>
-        </div>
-        <Button className='bg-blue-600 hover:bg-blue-700 text-white'>
-          <Link href={`/san-pham/${product.slug}`} className='block w-full'>
-            Xem chi tiết
-          </Link>
-        </Button>
-      </div>
-    </div>
-  );
-};
 
 // --- MAIN COMPONENT ---
 // Nhận props { shop } thay vì params
@@ -241,9 +204,9 @@ export default async function ShopDetailPage({ shop }: { shop: IShop }) {
               </div>
 
               {products.length > 0 ? (
-                <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4'>
-                  {products.map((prod) => (
-                    <ProductCard key={prod._id} product={prod} />
+                <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+                  {products.map((product) => (
+                    <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
               ) : (
