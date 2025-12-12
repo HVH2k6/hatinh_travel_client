@@ -1,21 +1,22 @@
-import ChatWidget from "@/components/chat/ChatWidget";
-import Header from "@/components/layout/Header";
-import { IWards } from "@/interfaces/IAddress";
+import ChatWidget from '@/components/chat/ChatWidget';
+import Header from '@/components/layout/Header';
+import { IWards } from '@/interfaces/IAddress';
 
-
-
-export default async function MainLayout({ children }: { children: React.ReactNode }) {
+export default async function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const wards: IWards[] = await fetch(
     `https://hatinh-travel-server.vercel.app/api/address/wards?province_code=42`,
-    { cache: "no-store" } // hoặc "force-cache" nếu muốn cache
-  ).then((res) => res.json())
-  console.log("🚀 ~ MainLayout ~ wards:", wards)
+    { cache: 'no-store' } // hoặc "force-cache" nếu muốn cache
+  ).then((res) => res.json());
 
   return (
     <>
       <Header wards={wards} />
-      <div className="container pt-20">{children}</div>
-      <ChatWidget/>
+      <div className='container pt-20'>{children}</div>
+      <ChatWidget />
     </>
   );
 }
