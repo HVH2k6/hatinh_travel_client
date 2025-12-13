@@ -67,6 +67,28 @@ export default function Header({ wards }: { wards: IWards[] }) {
           url: `/van-hoa-nghe-thuat/dia-phuong/${w.codename}`,
         })),
       },
+       {
+        title: 'Khác',
+        isSubMenu: true,
+        children: [
+          {
+            title: 'Blog',
+            url: '/blog',
+          },
+          {
+            title: 'Liên hệ',
+            url: '/lien-he',
+          },
+          {
+            title: 'Chính sách',
+            url: '/chinh-sach',
+          },
+          {
+            title: 'Audio lịch sử',
+            url: '/audio-lich-su',
+          }
+        ]
+      },
       { title: 'Chợ', url: '/kham-pha-cho', isSubMenu: false },
     ],
     [wards]

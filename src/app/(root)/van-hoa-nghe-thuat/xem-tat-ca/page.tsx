@@ -11,7 +11,7 @@ export default async function page() {
 
   return (
     <div>
-      <ListArt art={data.data} />
+      <ListArt art={data.data} isHeading={false} />
     </div>
   );
 }

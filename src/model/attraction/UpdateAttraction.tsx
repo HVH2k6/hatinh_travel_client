@@ -18,7 +18,6 @@ import InputUploadMultipleFiles from '@/components/input/InputUploadMultipleFile
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCheckAuth } from '@/components/auth/checkauth';
 import { Input } from '@/components/ui/input';
-// Đã xóa InputSelectDistrict
 import { InputSelectWard } from '@/components/input/InputSelectWard';
 import { toast } from 'react-toastify';
 import { HandleUpdateAttraction } from '@/action/HandleAttraction';
@@ -53,16 +52,18 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
 function toHHmmFromAny(v: any): string {
   if (v == null || v === '') return '';
   if (typeof v === 'string') {
+    // Nếu là chuỗi HH:mm hợp lệ
     if (timeRegex.test(v)) return v;
+    // Thử chuyển đổi chuỗi ngày/tháng/năm kèm giờ (ISO date string)
     const d = new Date(v);
     if (!isNaN(d.getTime())) {
+      // Sử dụng toLocaleTimeString để đảm bảo định dạng HH:mm
       return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
     }
     return '';
   }
-  if (v instanceof Date && !isNaN(v.getTime()))
-    return v.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
-  if (typeof v === 'number') {
+  // Nếu là đối tượng Date hoặc timestamp
+  if ((v instanceof Date && !isNaN(v.getTime())) || typeof v === 'number') {
     const d = new Date(v);
     if (!isNaN(d.getTime()))
       return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
@@ -70,6 +71,9 @@ function toHHmmFromAny(v: any): string {
   return '';
 }
 
+/**
+ * Component Select Giờ/Phút tách rời, trả về giá trị chuỗi "HH:mm"
+ */
 function TimeSelect({
   value,
   onChange,
@@ -79,13 +83,41 @@ function TimeSelect({
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
-  const [h, m] = (value || '').split(':');
-  const hour = HOURS.includes(h) ? h : '';
-  const minute = MINUTES.includes(m) ? m : '';
+  const [h, m] = useMemo(() => {
+    // Tách giá trị HH:mm từ prop value
+    const parts = (value || '').split(':');
+    const h = parts[0] && HOURS.includes(parts[0]) ? parts[0] : '';
+    const m = parts[1] && MINUTES.includes(parts[1]) ? parts[1] : '';
+    return [h, m];
+  }, [value]);
 
-  const update = (hh: string, mm: string) => {
-    if (hh && mm) onChange(`${hh}:${mm}`);
-    else onChange('');
+  const [hour, setHour] = useState(h);
+  const [minute, setMinute] = useState(m);
+
+  // Đồng bộ state nội bộ với prop value khi value thay đổi
+  useEffect(() => {
+    setHour(h);
+    setMinute(m);
+  }, [h, m]);
+
+  const update = (newH: string, newM: string) => {
+    if (newH && newM) {
+      onChange(`${newH}:${newM}`);
+    } else {
+      onChange('');
+    }
+  };
+
+  const handleHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newH = e.target.value;
+    setHour(newH);
+    update(newH, minute);
+  };
+
+  const handleMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newM = e.target.value;
+    setMinute(newM);
+    update(hour, newM);
   };
 
   return (
@@ -93,7 +125,7 @@ function TimeSelect({
       <select
         className="h-10 rounded-md border bg-background px-2"
         value={hour}
-        onChange={(e) => update(e.target.value, minute)}
+        onChange={handleHourChange}
         aria-label="Giờ"
       >
         <option value="">{placeholder}</option>
@@ -107,7 +139,7 @@ function TimeSelect({
       <select
         className="h-10 rounded-md border bg-background px-2"
         value={minute}
-        onChange={(e) => update(hour, e.target.value)}
+        onChange={handleMinuteChange}
         aria-label="Phút"
       >
         <option value="">{placeholder}</option>
@@ -137,11 +169,10 @@ export const formSchema = z
     description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
     categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
     typeId: z.string().min(1, { message: 'Vui lòng chọn loại địa điểm.' }),
-    
+
     // Schema Address mới
     address: z.object({
       provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
-      // districtId: z.string().min(1, { message: 'Chọn quận/huyện.' }), -> DELETE
       wardId: z.string().min(1, { message: 'Chọn phường/xã.' }),
       detail: z.string().optional(),
     }),
@@ -170,6 +201,7 @@ export const formSchema = z
     createdBy: z.string().optional(),
   })
   .superRefine((val, ctx) => {
+    // Chỉ kiểm tra khi cả hai trường đều có giá trị hợp lệ
     if (val.openTime && val.closeTime && timeRegex.test(val.openTime) && timeRegex.test(val.closeTime)) {
       const toMin = (s: string) => {
         const [h, m] = s.split(':').map(Number);
@@ -202,9 +234,10 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
   const [provinces, setProvinces] = useState<any[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
 
+  // Labels ban đầu (được dùng cho AI generate, dựa trên data cũ)
   const [labels] = useState<Labels>({
-    categoryName: data?.categoryId?.name ?? '',
-    typeName: data?.typeId?.name ?? '',
+    categoryName: (data as any)?.categoryId?.name ?? '',
+    typeName: (data as any)?.typeId?.name ?? '',
     provinceName: (data as any)?.address?.provinceId?.name ?? '',
     wardName: (data as any)?.address?.wardId?.name ?? '',
   });
@@ -220,7 +253,6 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
       // Address Default Values (Bỏ District)
       address: {
         provinceId: (data as any)?.address?.provinceId?._id ?? '',
-        // districtId: ... -> DELETE
         wardId: (data as any)?.address?.wardId?._id ?? '',
         detail: (data as any)?.address?.detail ?? '',
       },
@@ -231,6 +263,7 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
       isFree: Boolean(data?.isFree),
       minPrice: Number(data?.minPrice ?? 0),
       maxPrice: Number(data?.maxPrice ?? 0),
+      // Sử dụng hàm toHHmmFromAny để chuẩn hóa định dạng thời gian
       openTime: toHHmmFromAny((data as any)?.openTime),
       closeTime: toHHmmFromAny((data as any)?.closeTime),
 
@@ -245,10 +278,10 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
   });
 
   const [free, setFree] = useState<boolean>(defaultValues.isFree);
-  
+
   // Watch Province để lấy Code
   const selectedProvinceId = form.watch('address.provinceId');
-  
+
   // Tính toán Province Code
   const selectedProvinceCode = useMemo(() => {
     if (!selectedProvinceId || provinces.length === 0) return null;
@@ -256,15 +289,16 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
     return p ? p.code : null;
   }, [selectedProvinceId, provinces]);
 
+  // Load provinces data
   useEffect(() => {
     (async () => {
       try {
         const result = await getProvinces();
         setProvinces(result || []);
-        // Nếu data chưa có province, set mặc định cái đầu
+        // Nếu data chưa có province, set mặc định cái đầu (Chỉ chạy lần đầu)
         const current = form.getValues('address.provinceId');
         if (!current && result?.length) {
-          form.setValue('address.provinceId', result[0]._id);
+          form.setValue('address.provinceId', result[0]._id, { shouldValidate: true });
         }
         setDataLoaded(true);
       } catch (error) {
@@ -285,13 +319,14 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
 
   // AI Generate (Bỏ districtName)
   async function generateAiDescriptionStrict(v: FormType, lbls: Labels) {
+    // Lấy tên tỉnh hiện tại từ provinces state, hoặc fallback về label ban đầu
     const provinceName = provinces.find((p) => p._id === v.address?.provinceId)?.name || lbls.provinceName || '';
     const payload = {
       name: v.name,
-      categoryName: lbls.categoryName,
-      typeName: lbls.typeName,
+      categoryName: lbls.categoryName, // Lưu ý: lbls.categoryName là tên category cũ
+      typeName: lbls.typeName, // Tên type cũ
       provinceName,
-      wardName: lbls.wardName,
+      wardName: lbls.wardName, // Tên ward cũ
       addressDetail: v.address?.detail || '',
       isFree: v.isFree,
       minPrice: v.minPrice,
@@ -322,6 +357,7 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
 
     const payload: any = {
       ...values,
+      // Đảm bảo gửi chuỗi rỗng nếu không chọn, hoặc chuỗi HH:mm hợp lệ
       openTime: values.openTime?.trim() ? values.openTime : undefined,
       closeTime: values.closeTime?.trim() ? values.closeTime : undefined,
     };
@@ -439,7 +475,7 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
               </div>
             </section>
 
-            {/* ========== Giờ hoạt động ========== */}
+            {/* ========== Giờ hoạt động (SỬA LẠI ĐỂ SỬ DỤNG TIMESELECT ĐÚNG CÁCH) ========== */}
             <section className="space-y-4">
               <h3 className="text-base font-semibold">Giờ hoạt động</h3>
 
@@ -450,6 +486,7 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
                   render={({ field, fieldState }) => (
                     <div>
                       <Label className="block mb-2">Giờ mở cửa (00:00–23:59)</Label>
+                      {/* Truyền field.value và field.onChange trực tiếp */}
                       <TimeSelect value={field.value || ''} onChange={field.onChange} />
                       <p className="text-xs text-muted-foreground mt-1">Để trống nếu không rõ.</p>
                       {fieldState.error?.message ? (
@@ -465,6 +502,7 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
                   render={({ field, fieldState }) => (
                     <div>
                       <Label className="block mb-2">Giờ đóng cửa (00:00–23:59)</Label>
+                      {/* Truyền field.value và field.onChange trực tiếp */}
                       <TimeSelect value={field.value || ''} onChange={field.onChange} />
                       <p className="text-xs text-muted-foreground mt-1">
                         Nếu hoạt động qua đêm, để trống để bỏ kiểm tra.
@@ -494,15 +532,13 @@ const UpdateAttraction = ({ data, isLoading = false }: IUpdateAttraction) => {
                   />
                   {/* Nếu muốn input cho phép chọn tỉnh, dùng Select Component */}
                 </div>
-                
-                {/* Đã xóa InputSelectDistrict */}
 
                 {/* InputSelectWard nhận provinceCode */}
-                <InputSelectWard 
-                    control={form.control} 
-                    name="address.wardId" 
-                    label="Xã/Phường" 
-                    provinceCode={selectedProvinceCode} 
+                <InputSelectWard
+                  control={form.control}
+                  name="address.wardId"
+                  label="Xã/Phường"
+                  provinceCode={selectedProvinceCode}
                 />
 
                 <InputForm control={form.control} name="address.detail" label="Địa chỉ chi tiết" placeholder="VD: Thôn 3, xã ABC" />
