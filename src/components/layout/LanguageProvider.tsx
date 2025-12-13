@@ -31,7 +31,9 @@ function isTranslatable(node: Node) {
   
   const tag = parent.tagName.toLowerCase();
   if (["script", "style", "noscript", "code", "pre", "textarea", "input", "select"].includes(tag)) return false;
-  if (parent.closest("[data-no-translate]")) return false;
+  
+  // 💥 Kiểm tra data-no-translate để loại trừ các giá trị tiền tệ
+  if (parent.closest("[data-no-translate]")) return false; 
   
   return true;
 }
@@ -46,17 +48,19 @@ function hashString(s: string) {
 }
 
 function formatCurrency(amount: number, lang: Lang): string {
-  const exchangeRates = {
-    vi: { rate: 1, symbol: "₫", locale: "vi-VN" },
-    en: { rate: 0.000040, symbol: "$", locale: "en-US" },
-    zh: { rate: 0.00029, symbol: "¥", locale: "zh-CN" } // Sửa locale
+  const currencyConfig = {
+    vi: { rate: 1, currency: "VND", locale: "vi-VN", symbol: "₫" },
+    en: { rate: 0.000040, currency: "USD", locale: "en-US", symbol: "$" },
+    zh: { rate: 0.00029, currency: "CNY", locale: "zh-CN", symbol: "¥" }
   };
 
-  const config = exchangeRates[lang];
+  const config = currencyConfig[lang];
   const converted = amount * config.rate;
 
+  // Sử dụng NumberFormat chuẩn để định dạng
   const formatted = new Intl.NumberFormat(config.locale, {
-    style: 'decimal',
+    // 💥 CHỈNH SỬA: Dùng style: 'decimal' và thêm symbol để PriceDisplay có thể tách biệt
+    style: 'decimal', 
     minimumFractionDigits: 0,
     maximumFractionDigits: lang === 'vi' ? 0 : 2
   }).format(converted);
@@ -72,7 +76,7 @@ export default function TranslatorProvider({ children }: { children: React.React
   const translationCache = useRef<Map<string, string>>(new Map());
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const observerRef = useRef<MutationObserver | null>(null);
-  const isTranslating = useRef(false); // Ngăn duplicate translation
+  const isTranslating = useRef(false);
 
   // Load ngôn ngữ từ localStorage
   useEffect(() => {
@@ -102,8 +106,9 @@ export default function TranslatorProvider({ children }: { children: React.React
   const revertToOriginal = () => {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
     let node: Node | null;
+    // Bỏ qua việc revert các node bị đánh dấu không dịch
     while ((node = walker.nextNode())) {
-      if (originalTextMap.current.has(node)) {
+      if (originalTextMap.current.has(node) && node.parentElement?.closest('[data-no-translate]') === null) {
         node.nodeValue = originalTextMap.current.get(node)!;
       }
     }
@@ -143,7 +148,6 @@ export default function TranslatorProvider({ children }: { children: React.React
       }
 
       if (textsToTranslate.length > 0) {
-        // Batch size nhỏ hơn để tránh timeout
         const batchSize = 30;
         
         for (let i = 0; i < textsToTranslate.length; i += batchSize) {
@@ -151,11 +155,12 @@ export default function TranslatorProvider({ children }: { children: React.React
           const batchNodes = nodesToTranslate.slice(i, i + batchSize);
 
           try {
+            // ... (Phần fetch API dịch đã đúng và không cần sửa) ...
             const response = await fetch('/api/translate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ 
-                text: batchTexts,
+                text: batchTexts, 
                 targetLang 
               })
             });
@@ -180,7 +185,6 @@ export default function TranslatorProvider({ children }: { children: React.React
               }
             });
 
-            // Delay nhỏ giữa các batch để tránh rate limit
             if (i + batchSize < textsToTranslate.length) {
               await new Promise(resolve => setTimeout(resolve, 200));
             }
@@ -213,7 +217,7 @@ export default function TranslatorProvider({ children }: { children: React.React
         if (!isTranslating.current) {
           triggerTranslation(lang);
         }
-      }, 800); // Tăng debounce delay
+      }, 800);
     });
 
     observer.observe(document.body, {

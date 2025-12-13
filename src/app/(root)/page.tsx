@@ -41,7 +41,7 @@ async function getData() {
   // 2. Tối ưu Performance: Dùng Promise.all để fetch song song 3 API cùng lúc
   // Giúp giảm thời gian chờ (Time To First Byte - TTFB) -> Tốt cho SEO
   const [resAttractions, resFood, resArt] = await Promise.all([
-    fetch(`${API_URL}/attractions`, { next: { revalidate: 3600 } }), // Cache 1 tiếng (Tốt hơn no-store)
+    fetch(`${API_URL}/attractions?limit=4`, { next: { revalidate: 3600 } }), // Cache 1 tiếng (Tốt hơn no-store)
     fetch(`${API_URL}/food?limit=4`, { next: { revalidate: 3600 } }),
     fetch(`${API_URL}/art?limit=4`, { next: { revalidate: 3600 } }),
   ]);

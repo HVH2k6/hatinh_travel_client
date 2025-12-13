@@ -27,7 +27,7 @@ import { useCheckAuth } from '@/components/auth/checkauth';
 import { toast } from 'react-toastify';
 import { HandleCreateAttraction } from '@/action/HandleAttraction';
 
-/* ============================ TIME SELECT ============================ */
+/* ============================ TIME SELECT (ĐÃ FIX LỖI) ============================ */
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
@@ -48,13 +48,32 @@ function TimeSelect({
   minuteLabel?: string;
   className?: string;
 }) {
+  // Tách giá trị hiện tại ra giờ và phút. Nếu value rỗng, h và m sẽ là ''
   const [h, m] = (value || '').split(':');
-  const hour = HOURS.includes(h) ? h : '';
-  const minute = MINUTES.includes(m) ? m : '';
 
-  const update = (hh: string, mm: string) => {
-    if (hh && mm) onChange(`${hh}:${mm}`);
-    else onChange('');
+  // Đảm bảo giá trị hiển thị trên select khớp với list option
+  const currentHour = HOURS.includes(h) ? h : '';
+  const currentMinute = MINUTES.includes(m) ? m : '';
+
+  const update = (newHour: string, newMinute: string) => {
+    // Trường hợp 1: Người dùng muốn xóa (chọn placeholder)
+    if (!newHour && !newMinute) {
+      onChange('');
+      return;
+    }
+
+    // Trường hợp 2: Logic tự động điền '00'
+    // Nếu chọn Giờ mà chưa có Phút -> Mặc định Phút = '00'
+    // Nếu chọn Phút mà chưa có Giờ -> Mặc định Giờ = '00' 
+    const finalHour = newHour || (newMinute ? '00' : '');
+    const finalMinute = newMinute || (newHour ? '00' : '');
+
+    // Chỉ update khi có đủ cả giờ và phút (dù là '00')
+    if (finalHour && finalMinute) {
+      onChange(`${finalHour}:${finalMinute}`);
+    } else {
+      onChange('');
+    }
   };
 
   return (
@@ -63,8 +82,8 @@ function TimeSelect({
         <label className="sr-only">{hourLabel}</label>
         <select
           className="h-10 rounded-md border bg-background px-2"
-          value={hour}
-          onChange={(e) => update(e.target.value, minute)}
+          value={currentHour}
+          onChange={(e) => update(e.target.value, currentMinute)}
           aria-label={hourLabel}
         >
           <option value="">{placeholder}</option>
@@ -80,8 +99,8 @@ function TimeSelect({
         <label className="sr-only">{minuteLabel}</label>
         <select
           className="h-10 rounded-md border bg-background px-2"
-          value={minute}
-          onChange={(e) => update(hour, e.target.value)}
+          value={currentMinute}
+          onChange={(e) => update(currentHour, e.target.value)}
           aria-label={minuteLabel}
         >
           <option value="">{placeholder}</option>
@@ -119,7 +138,7 @@ export const formSchema = z
     description: z.string().min(10, { message: 'Vui lòng nhập mô tả chi tiết hơn.' }),
     categoryId: z.string().min(1, { message: 'Vui lòng chọn danh mục.' }),
     typeId: z.string().min(1, { message: 'Vui lòng chọn loại địa điểm.' }),
-    
+
     // --- SỬA ADDRESS: BỎ DISTRICT ---
     address: z.object({
       provinceId: z.string().min(1, { message: 'Chọn tỉnh/thành phố.' }),
@@ -209,7 +228,7 @@ const CreateAttraction = () => {
 
   // Watch provinceId để lấy Code
   const selectedProvinceId = form.watch('address.provinceId');
-  
+
   // Tính toán Province Code để truyền vào Ward Component
   const selectedProvinceCode = useMemo(() => {
     if (!selectedProvinceId || provinces.length === 0) return null;
@@ -233,7 +252,7 @@ const CreateAttraction = () => {
 
   // Reset Ward khi đổi Tỉnh (để tránh ID xã cũ của tỉnh khác)
   useEffect(() => {
-      form.setValue('address.wardId', '');
+    form.setValue('address.wardId', '');
   }, [selectedProvinceId, form]);
 
   const listStatus = useMemo(
@@ -477,7 +496,6 @@ const CreateAttraction = () => {
                     disabled
                     value={provinces.find((p) => p._id === form.watch('address.provinceId'))?.name || ''}
                   />
-                  {/* Nếu muốn input cho phép chọn tỉnh, hãy dùng Select Component thay vì Input disabled */}
                 </div>
 
                 {/* Đã xóa InputSelectDistrict */}
