@@ -41,7 +41,7 @@ const milestonesWithImages = [
     description:
       'Hà Tĩnh giữ vị trí chiến lược quân sự quan trọng. Thời kỳ này hình thành nên cốt cách con người kiên trung và kho tàng văn hóa dân gian Ví, Giặm đặc sắc (Di sản văn hóa phi vật thể đại diện của nhân loại).',
     image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349424/qpveehw8urt1otksmtkr.jpg',
+      'https://lh3.googleusercontent.com/d/1KB3JBHo3methit_BQoWJcw4AcVwx2nfU',
     icon: History,
   },
   {
@@ -50,7 +50,7 @@ const milestonesWithImages = [
     description:
       'Biểu tượng của chủ nghĩa anh hùng cách mạng. Sự hy sinh của 10 nữ thanh niên xung phong đã biến nơi đây thành "địa chỉ đỏ" giáo dục truyền thống và điểm du lịch tâm linh trọng điểm.',
     image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/sz0f6vhhsqhgmbgrr1ki.jpg',
+      'https://lh3.googleusercontent.com/d/16WNlpRKUDBHLdCUwkcj25ULKfvsP6Jbl',
     icon: MapPin,
   },
   {
