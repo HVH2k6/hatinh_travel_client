@@ -55,7 +55,7 @@ export default async function Page({
 }) {
   const params = await searchParams;
   const currentPage = Number(params.page) || 1;
-  const LIMIT = 24;
+  const LIMIT = 12;
 
   const { data: attractions, totalPages } = await getAttractions(currentPage, LIMIT);
 
@@ -98,7 +98,7 @@ export default async function Page({
 
         {attractions.length > 0 ? (
           <>
-            <AttractionList data={attractions} />
+            <AttractionList data={attractions} isHeading={false} />
             
             {/* Phân trang */}
             <div className="mt-8">
