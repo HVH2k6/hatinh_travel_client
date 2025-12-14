@@ -89,7 +89,7 @@ export function LoginForm() {
 
           <div className="flex items-center justify-end -mt-2">
             <Link
-              href="/auth/forgot-password"
+              href="/tai-khoan/quen-mat-khau"
               className="text-sm font-medium text-sky-600 hover:text-sky-700"
             >
               Quên mật khẩu?

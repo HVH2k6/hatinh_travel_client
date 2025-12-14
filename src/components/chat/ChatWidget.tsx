@@ -110,7 +110,7 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-1/3 right-10 z-[9999] flex flex-col items-end gap-4 font-sans">
+    <div className="fixed bottom-3 right-10 z-[9999] flex flex-col items-end gap-4 font-sans">
       {/* 1. NÚT MỞ CHAT (Khi đóng) */}
       {!isOpen && (
         <Button 
