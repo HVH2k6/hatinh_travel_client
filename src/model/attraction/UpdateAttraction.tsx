@@ -83,49 +83,30 @@ function TimeSelect({
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
-  const [h, m] = useMemo(() => {
-    // Tách giá trị HH:mm từ prop value
-    const parts = (value || '').split(':');
-    const h = parts[0] && HOURS.includes(parts[0]) ? parts[0] : '';
-    const m = parts[1] && MINUTES.includes(parts[1]) ? parts[1] : '';
-    return [h, m];
-  }, [value]);
+  // Tách giá trị hiện tại ra giờ và phút. Nếu value rỗng, h và m sẽ là ''
+  const [h, m] = (value || '').split(':');
 
-  const [hour, setHour] = useState(h);
-  const [minute, setMinute] = useState(m);
+  // Đảm bảo giá trị hiển thị trên select khớp với list option
+  const currentHour = HOURS.includes(h) ? h : '';
+  const currentMinute = MINUTES.includes(m) ? m : '';
 
-  // Đồng bộ state nội bộ với prop value khi value thay đổi
-  useEffect(() => {
-    setHour(h);
-    setMinute(m);
-  }, [h, m]);
-
-  const update = (newH: string, newM: string) => {
-    if (newH && newM) {
-      onChange(`${newH}:${newM}`);
-    } else {
+  const update = (newHour: string, newMinute: string) => {
+    // Nếu 1 trong 2 select đang là placeholder -> coi như xoá giá trị
+    if (!newHour || !newMinute) {
       onChange('');
+      return;
     }
-  };
 
-  const handleHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newH = e.target.value;
-    setHour(newH);
-    update(newH, minute);
-  };
-
-  const handleMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newM = e.target.value;
-    setMinute(newM);
-    update(hour, newM);
+    // Chỉ khi cả giờ và phút đều được chọn thì mới set vào form
+    onChange(`${newHour}:${newMinute}`);
   };
 
   return (
     <div className="flex items-center gap-2">
       <select
         className="h-10 rounded-md border bg-background px-2"
-        value={hour}
-        onChange={handleHourChange}
+        value={currentHour}
+        onChange={(e) => update(e.target.value, currentMinute)}
         aria-label="Giờ"
       >
         <option value="">{placeholder}</option>
@@ -138,8 +119,8 @@ function TimeSelect({
       <span className="text-muted-foreground">:</span>
       <select
         className="h-10 rounded-md border bg-background px-2"
-        value={minute}
-        onChange={handleMinuteChange}
+        value={currentMinute}
+        onChange={(e) => update(currentHour, e.target.value)}
         aria-label="Phút"
       >
         <option value="">{placeholder}</option>
@@ -150,7 +131,11 @@ function TimeSelect({
         ))}
       </select>
       {value ? (
-        <button type="button" className="text-xs text-muted-foreground hover:underline" onClick={() => onChange('')}>
+        <button
+          type="button"
+          className="text-xs text-muted-foreground hover:underline"
+          onClick={() => onChange('')}
+        >
           Xoá
         </button>
       ) : null}

@@ -56,24 +56,14 @@ function TimeSelect({
   const currentMinute = MINUTES.includes(m) ? m : '';
 
   const update = (newHour: string, newMinute: string) => {
-    // Trường hợp 1: Người dùng muốn xóa (chọn placeholder)
-    if (!newHour && !newMinute) {
+    // Nếu 1 trong 2 select đang là placeholder -> coi như xoá giá trị
+    if (!newHour || !newMinute) {
       onChange('');
       return;
     }
 
-    // Trường hợp 2: Logic tự động điền '00'
-    // Nếu chọn Giờ mà chưa có Phút -> Mặc định Phút = '00'
-    // Nếu chọn Phút mà chưa có Giờ -> Mặc định Giờ = '00' 
-    const finalHour = newHour || (newMinute ? '00' : '');
-    const finalMinute = newMinute || (newHour ? '00' : '');
-
-    // Chỉ update khi có đủ cả giờ và phút (dù là '00')
-    if (finalHour && finalMinute) {
-      onChange(`${finalHour}:${finalMinute}`);
-    } else {
-      onChange('');
-    }
+    // Chỉ khi cả giờ và phút đều được chọn thì mới set vào form
+    onChange(`${newHour}:${newMinute}`);
   };
 
   return (
