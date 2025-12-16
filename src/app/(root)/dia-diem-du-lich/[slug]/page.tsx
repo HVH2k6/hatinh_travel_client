@@ -118,8 +118,22 @@ export default async function Page({ params }: Props) {
         dayOfWeek: [
           "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
         ],
-        opens: attraction.openTime ? new Date(attraction.openTime).toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'}) : '00:00',
-        closes: attraction.closeTime ? new Date(attraction.closeTime).toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'}) : '23:59'
+        opens: attraction.openTime
+          ? (() => {
+              const d = new Date(attraction.openTime);
+              const hh = String(d.getUTCHours()).padStart(2, '0');
+              const mm = String(d.getUTCMinutes()).padStart(2, '0');
+              return `${hh}:${mm}`;
+            })()
+          : '00:00',
+        closes: attraction.closeTime
+          ? (() => {
+              const d = new Date(attraction.closeTime);
+              const hh = String(d.getUTCHours()).padStart(2, '0');
+              const mm = String(d.getUTCMinutes()).padStart(2, '0');
+              return `${hh}:${mm}`;
+            })()
+          : '23:59'
       }
     ]
   }

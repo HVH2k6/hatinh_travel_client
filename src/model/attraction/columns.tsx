@@ -44,33 +44,27 @@ function toHHmm(v: unknown): string {
     // Thử parse ISO
     const d = new Date(v);
     if (!isNaN(d.getTime())) {
-      return d.toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
+      const hh = String(d.getUTCHours()).padStart(2, "0");
+      const mm = String(d.getUTCMinutes()).padStart(2, "0");
+      return `${hh}:${mm}`;
     }
     return "—";
   }
 
   // Date object
   if (v instanceof Date && !isNaN(v.getTime())) {
-    return v.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+    const hh = String(v.getUTCHours()).padStart(2, "0");
+    const mm = String(v.getUTCMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
   }
 
   // number timestamp
   if (typeof v === "number") {
     const d = new Date(v);
     if (!isNaN(d.getTime())) {
-      return d.toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
+      const hh = String(d.getUTCHours()).padStart(2, "0");
+      const mm = String(d.getUTCMinutes()).padStart(2, "0");
+      return `${hh}:${mm}`;
     }
   }
 

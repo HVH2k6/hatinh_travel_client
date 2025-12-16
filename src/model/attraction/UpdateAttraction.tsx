@@ -57,16 +57,21 @@ function toHHmmFromAny(v: any): string {
     // Thử chuyển đổi chuỗi ngày/tháng/năm kèm giờ (ISO date string)
     const d = new Date(v);
     if (!isNaN(d.getTime())) {
-      // Sử dụng toLocaleTimeString để đảm bảo định dạng HH:mm
-      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
+      // ĐỌC THEO UTC để không bị lệch múi giờ giữa server (UTC) và client (VD: +7)
+      const hh = String(d.getUTCHours()).padStart(2, '0');
+      const mm = String(d.getUTCMinutes()).padStart(2, '0');
+      return `${hh}:${mm}`;
     }
     return '';
   }
   // Nếu là đối tượng Date hoặc timestamp
   if ((v instanceof Date && !isNaN(v.getTime())) || typeof v === 'number') {
     const d = new Date(v);
-    if (!isNaN(d.getTime()))
-      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
+    if (!isNaN(d.getTime())) {
+      const hh = String(d.getUTCHours()).padStart(2, '0');
+      const mm = String(d.getUTCMinutes()).padStart(2, '0');
+      return `${hh}:${mm}`;
+    }
   }
   return '';
 }
