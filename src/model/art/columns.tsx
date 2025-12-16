@@ -65,7 +65,7 @@ function ActionsCell({ id }: { id: string }) {
         aria-label='Sửa nghệ thuật'
       >
         {/* Sửa đường dẫn sang trang sửa Unit */}
-        <Link href={`/quan-ly/nghe-thuat/sua/${id}`}>
+        <Link href={`/quan-ly/van-hoa-nghe-thuat/sua/${id}`}>
           <Pencil className='w-4 h-4' />
         </Link>
       </Button>

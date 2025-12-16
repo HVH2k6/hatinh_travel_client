@@ -6,6 +6,7 @@ import { IArt } from '@/interfaces/IArt'
 type Props = { art: IArt[],isHeading?: boolean }
 
 export default function ListArt({ art,isHeading= true }: Props) {
+  console.log(">>>>>>:",art);
   
   if (!art?.length) {
     return (

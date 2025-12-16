@@ -11,6 +11,7 @@ type Props = { art: IArt };
 
 export default function CardArt({ art }: Props) {
   const { slug, name, image, address, categoryId } = art;
+  console.log(">>>>>> card:",art); 
 
   // Xử lý địa chỉ: Chỉ lấy Quận/Huyện, Tỉnh
   const location =

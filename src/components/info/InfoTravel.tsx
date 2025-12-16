@@ -89,6 +89,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
       </div>
     );
   }
+  console.log(arts);
 
   return (
     <main className='bg-slate-50 font-sans text-slate-900 overflow-x-hidden'>

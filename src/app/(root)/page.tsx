@@ -64,7 +64,7 @@ async function getData() {
 
 export default async function Page() {
   const { attractions, foods, arts } = await getData();
-
+console.log(arts);
   // 3. Tạo Schema Markup (JSON-LD)
   // Giúp Google hiển thị dạng danh sách (List) đẹp mắt trên kết quả tìm kiếm
   const jsonLd = {
