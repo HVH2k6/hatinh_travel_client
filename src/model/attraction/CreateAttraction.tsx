@@ -55,15 +55,36 @@ function TimeSelect({
   const currentHour = HOURS.includes(h) ? h : '';
   const currentMinute = MINUTES.includes(m) ? m : '';
 
-  const update = (newHour: string, newMinute: string) => {
-    // Nếu 1 trong 2 select đang là placeholder -> coi như xoá giá trị
-    if (!newHour || !newMinute) {
-      onChange('');
-      return;
-    }
+  // State local để lưu giá trị đang được chọn (chưa commit vào form)
+  const [tempHour, setTempHour] = useState<string>(currentHour);
+  const [tempMinute, setTempMinute] = useState<string>(currentMinute);
 
-    // Chỉ khi cả giờ và phút đều được chọn thì mới set vào form
-    onChange(`${newHour}:${newMinute}`);
+  // Sync state local với value từ form khi value thay đổi từ bên ngoài
+  useEffect(() => {
+    setTempHour(currentHour);
+    setTempMinute(currentMinute);
+  }, [currentHour, currentMinute]);
+
+  const handleHourChange = (newHour: string) => {
+    setTempHour(newHour);
+    // Nếu cả giờ và phút đều có giá trị, update form ngay
+    if (newHour && tempMinute) {
+      onChange(`${newHour}:${tempMinute}`);
+    } else {
+      // Nếu một trong hai bị xóa, xóa giá trị trong form
+      onChange('');
+    }
+  };
+
+  const handleMinuteChange = (newMinute: string) => {
+    setTempMinute(newMinute);
+    // Nếu cả giờ và phút đều có giá trị, update form ngay
+    if (tempHour && newMinute) {
+      onChange(`${tempHour}:${newMinute}`);
+    } else {
+      // Nếu một trong hai bị xóa, xóa giá trị trong form
+      onChange('');
+    }
   };
 
   return (
@@ -72,8 +93,8 @@ function TimeSelect({
         <label className="sr-only">{hourLabel}</label>
         <select
           className="h-10 rounded-md border bg-background px-2"
-          value={currentHour}
-          onChange={(e) => update(e.target.value, currentMinute)}
+          value={tempHour}
+          onChange={(e) => handleHourChange(e.target.value)}
           aria-label={hourLabel}
         >
           <option value="">{placeholder}</option>
@@ -89,8 +110,8 @@ function TimeSelect({
         <label className="sr-only">{minuteLabel}</label>
         <select
           className="h-10 rounded-md border bg-background px-2"
-          value={currentMinute}
-          onChange={(e) => update(currentHour, e.target.value)}
+          value={tempMinute}
+          onChange={(e) => handleMinuteChange(e.target.value)}
           aria-label={minuteLabel}
         >
           <option value="">{placeholder}</option>
@@ -105,7 +126,11 @@ function TimeSelect({
       {value ? (
         <button
           type="button"
-          onClick={() => onChange('')}
+          onClick={() => {
+            setTempHour('');
+            setTempMinute('');
+            onChange('');
+          }}
           className="text-xs text-muted-foreground hover:underline"
           aria-label="Xoá giờ đã chọn"
         >
