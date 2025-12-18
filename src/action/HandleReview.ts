@@ -15,30 +15,40 @@ const getAuthHeaders = async () => {
 };
 
 // 1. CREATE REVIEW
+// LƯU Ý: Không throw Error để tránh làm vỡ Server Components khi Server Action fail.
+// Thay vào đó luôn trả về object { success, data?, error? } để client tự handle.
 export const HandleCreateReview = async (data: any) => {
   try {
-    // Lấy headers trước khi fetch
-    const headers = await getAuthHeaders(); 
+    const headers = await getAuthHeaders();
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/review`, {
       method: 'POST',
-      headers: headers, // Truyền object đã được await
+      headers,
       body: JSON.stringify(data),
       cache: 'no-store',
     });
 
+    const result = await res.json().catch(() => ({}));
+
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to create review');
+      console.error('❌ Server responded with error:', result);
+      return {
+        success: false,
+        error: result?.message || 'Failed to create review',
+      };
     }
 
-    const result = await res.json();
     revalidateTag('review');
-    return result;
-  } catch (error) {
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error: any) {
     console.error('🚨 Error creating review:', error);
-    throw error;
+    return {
+      success: false,
+      error: error?.message || 'Failed to create review',
+    };
   }
 };
 

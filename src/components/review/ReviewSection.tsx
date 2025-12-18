@@ -226,20 +226,22 @@ export default function ReviewSection({
     if (!user) return toast.error(t.login_required);
 
     startTransition(async () => {
-      try {
-        await HandleCreateReview({
-          ...data,
-          rating,
-          targetId,
-          targetType,
-        });
-        toast.success(t.success_create);
-        reset();
-        setRating(5);
-        fetchReviews(1);
-      } catch (error: any) {
-        toast.error(error.message || t.error_general);
+      const result = await HandleCreateReview({
+        ...data,
+        rating,
+        targetId,
+        targetType,
+      });
+
+      if (!result?.success) {
+        toast.error(result?.error || t.error_general);
+        return;
       }
+
+      toast.success(t.success_create);
+      reset();
+      setRating(5);
+      fetchReviews(1);
     });
   };
 
