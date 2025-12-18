@@ -53,32 +53,40 @@ export const HandleCreateReview = async (data: any) => {
 };
 
 // 2. UPDATE REVIEW
+// TƯƠNG TỰ CREATE: không throw Error ra ngoài để tránh làm vỡ Server Components.
+// Luôn trả về object { success, data?, error? }.
 export const HandleUpdateReview = async (data: any, id: string) => {
   try {
-    const headers = await getAuthHeaders(); // Thêm await
+    const headers = await getAuthHeaders();
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/review/${id}`,
-      {
-        method: 'PUT',
-        headers: headers, // Truyền biến headers vào
-        body: JSON.stringify(data),
-        cache: 'no-store',
-      }
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/review/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(data),
+      cache: 'no-store',
+    });
+
+    const result = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error('❌ Server responded with error:', errorData);
-      throw new Error(errorData?.message || 'Failed to update review');
+      console.error('❌ Server responded with error:', result);
+      return {
+        success: false,
+        error: result?.message || 'Failed to update review',
+      };
     }
 
-    const result = await res.json();
     revalidateTag('review');
-    return result;
-  } catch (error) {
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error: any) {
     console.error('🚨 Error updating review:', error);
-    throw error;
+    return {
+      success: false,
+      error: error?.message || 'Failed to update review',
+    };
   }
 };
 
