@@ -18,9 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 // API Service
 import { forgotPasswordApi, resetPasswordApi } from '@/service/auth-service';
 
-/* ================= SCHEMAS ================= */
 
-// Schema Bước 1: Nhập Email
 const emailSchema = z.object({
   email: z.string().email({ message: 'Email không hợp lệ' }),
 });

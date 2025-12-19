@@ -199,7 +199,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
             <div className='relative h-[500px]'>
               <div className='absolute top-0 right-0 w-4/5 h-4/5 rounded-2xl overflow-hidden shadow-2xl z-10 hover:shadow-3xl transition-shadow duration-500'>
                 <img
-                  src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/vq6jjkn13vuosh5ekyap.jpg'
+                  src='https://lh3.googleusercontent.com/d/1GSUCJBHZ_1_jhkpA0-jj8hmj2Dn6MCXS'
                   className='w-full h-full object-cover hover:scale-105 transition-transform duration-700'
                   alt='Khu lưu niệm Nguyễn Du'
                   loading='lazy'

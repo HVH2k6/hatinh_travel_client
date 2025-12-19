@@ -6,7 +6,7 @@ import {
   Scale,
   ShoppingBag,
   SquareMenu,
-  SquareTerminal,
+  // VscCodeReview ,
 } from 'lucide-react';
 
 export const STATUS = {
@@ -148,6 +148,24 @@ export const menuSidebarAdmin = [
       },
     ],
   },
+    {
+    title: 'Review',
+    url: '#',
+    icon: null,
+    page: 'admin',
+
+    items: [
+      {
+        title: 'Danh sách văn hóa nghệ thuật',
+        url: '/quan-ly/van-hoa-nghe-thuat',
+      },
+   
+      {
+        title: 'Tạo mới văn hóa nghệ thuật',
+        url: '/quan-ly/van-hoa-nghe-thuat/tao-moi',
+      },
+    ],
+  },
   {
     title: 'Đơn vị tính',
     url: '#',
@@ -164,6 +182,7 @@ export const menuSidebarAdmin = [
         url: '/quan-ly/don-vi-tinh/tao-moi',
       },
     ],
+    
   },
   {
     title: 'Cửa hàng',
