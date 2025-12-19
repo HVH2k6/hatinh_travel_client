@@ -2,6 +2,7 @@ import {
   Cake,
   FileType,
   Map,
+  MessageCircle,
   Music,
   Scale,
   ShoppingBag,
@@ -151,19 +152,15 @@ export const menuSidebarAdmin = [
     {
     title: 'Review',
     url: '#',
-    icon: null,
+    icon: MessageCircle,
     page: 'admin',
 
     items: [
       {
-        title: 'Danh sách văn hóa nghệ thuật',
-        url: '/quan-ly/van-hoa-nghe-thuat',
+        title: 'Danh sách',
+        url: '/quan-ly/review',
       },
    
-      {
-        title: 'Tạo mới văn hóa nghệ thuật',
-        url: '/quan-ly/van-hoa-nghe-thuat/tao-moi',
-      },
     ],
   },
   {
