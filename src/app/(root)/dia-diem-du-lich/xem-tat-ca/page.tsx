@@ -32,7 +32,7 @@ async function getAttractions(page: number = 1, limit: number = 24) {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/attractions?limit=${limit}&page=${page}`,
-      { next: { revalidate: 3600 } } // Cache 1 tiếng
+      { cache:"no-cache"} // Cache 1 tiếng
     );
     
     if (!res.ok) return { data: [], totalPages: 0 };

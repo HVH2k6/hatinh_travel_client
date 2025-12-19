@@ -39,7 +39,7 @@ async function getFoods(page: number = 1, limit: number = 24) {
     // Gọi API với tham số page và limit
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/food?limit=${limit}&page=${page}`,
-      { next: { revalidate: 3600 } }
+      {cache:'no-cache'}
     );
 
     if (!res.ok) return { data: [], totalPages: 0 };
