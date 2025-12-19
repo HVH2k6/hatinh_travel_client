@@ -6,6 +6,7 @@ import { STATUS } from '@/util/constant';
 type Props = { data: IAttraction[]; isHeading?: boolean };
 
 export default function AttractionList({ data, isHeading = true }: Props) {
+  console.log("🚀 ~ AttractionList ~ data:", data)
   if (!data?.length) {
     return (
       <p className='text-center text-muted-foreground'>
