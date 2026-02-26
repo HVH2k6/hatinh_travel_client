@@ -65,7 +65,7 @@ function ActionsCell({ id }: { id: string }) {
         aria-label='Sửa nghệ thuật'
       >
         {/* Sửa đường dẫn sang trang sửa Unit */}
-        <Link href={`/quan-ly/nghe-thuat/sua/${id}`}>
+        <Link href={`/quan-ly/van-hoa-nghe-thuat/sua/${id}`}>
           <Pencil className='w-4 h-4' />
         </Link>
       </Button>
@@ -122,6 +122,17 @@ export const columns: ColumnDef<IArt>[] = [
   {
     accessorKey: 'video_url',
     header: 'Link',
+    cell: ({ row }) => {
+      return (
+        <Link
+          href={(row.original as any)?.video_url}
+          target='_blank'
+          className='text-blue-600 hover:text-blue-800'
+        >
+          {((row.original as any)?.video_url).slice(0, 50) + '...'}
+        </Link>
+      )
+    }
    
   },
   {
@@ -133,7 +144,7 @@ export const columns: ColumnDef<IArt>[] = [
         <div className='text-sm max-w-xs'>
           <div>{address?.wardId?.name || ''}</div>
           <div className='text-muted-foreground text-xs'>
-            {address?.districtId?.name || ''}, {address?.provinceId?.name || ''}
+            {address?.provinceId?.name || ''}
           </div>
         </div>
       );

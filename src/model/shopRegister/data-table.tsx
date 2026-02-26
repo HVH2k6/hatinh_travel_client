@@ -26,7 +26,7 @@ const filtered = React.useMemo(() => {
     const addr = d.shopDraft?.address;
 
     const province: any = addr?.provinceId;
-    const district: any = addr?.districtId;
+    
     const ward: any = addr?.wardId;
 
     const haystack = [
@@ -36,7 +36,7 @@ const filtered = React.useMemo(() => {
       typeof user === "object" ? (user?.email || "") : "",
       d.shopDraft?.contact?.phone || "",
       typeof province === "object" ? (province?.name || "") : "",
-      typeof district === "object" ? (district?.name || "") : "",
+      
       typeof ward === "object" ? (ward?.name || "") : "",
       addr?.detail || "",
       d.status || "",

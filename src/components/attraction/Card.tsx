@@ -29,7 +29,7 @@ export default function AttractionCard({ attraction }: Props) {
 
   // Xử lý địa chỉ
   const location =
-    [address?.wardId?.name, address?.districtId?.name, address?.provinceId?.name]
+    [address?.wardId?.name,  address?.provinceId?.name]
       .filter(Boolean)
       .join(', ') || 'Đang cập nhật'
 

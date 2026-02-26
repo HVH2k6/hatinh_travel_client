@@ -98,7 +98,7 @@ export default function DetailRegister({ data }: DetailRegisterProps) {
   const location =
     [
       addressData?.wardId?.name,
-      addressData?.districtId?.name,
+      
       addressData?.provinceId?.name,
     ]
       .filter(Boolean)

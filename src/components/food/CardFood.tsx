@@ -16,7 +16,7 @@ export default function CardFood({ food }: Props) {
 
   // Xử lý địa chỉ: Chỉ lấy Quận/Huyện, Tỉnh để ngắn gọn hơn cho card du lịch
   const location =
-    [address?.districtId?.name, address?.provinceId?.name]
+    [address?.wardId?.name, address?.provinceId?.name]
       .filter(Boolean)
       .join(', ') || 'Đang cập nhật';
 

@@ -32,7 +32,7 @@ export default async function Page({ params }: PageProps) {
   if (!res.ok) return <div>Không có dữ liệu</div>
 const RegisterShopData = await res.json()
   const data: ISellerApplication | null = RegisterShopData
-  console.log("🚀 ~ Page ~ data:", data)
+  // console.log("🚀 ~ Page ~ data:", data)
   if (!data) return <div>Không có dữ liệu</div>
 
   return <DetailRegister data={data} />

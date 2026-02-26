@@ -1,38 +1,18 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  images: {
+   images: {
       remotePatterns: [
           {
               protocol: 'https',
-              hostname:'res.cloudinary.com',
-              port: '',
-              pathname: '/**',
-
+              hostname: '**', // Cho phép mọi domain HTTPS
           },
           {
-              protocol: 'https',
-              hostname:'images.unsplash.com',
-              port: '',
-              pathname: '/**',
-          },
-          {
-              protocol: 'https',
-              hostname:'lh3.googleusercontent.com',
-              port: '',
-              pathname: '/**',
-          },
-          {
-              protocol: 'https',
-              hostname:'img.youtube.com',
-              port: '',
-              pathname: '/**',
+              protocol: 'http',
+              hostname: '**', // Cho phép mọi domain HTTP
           }
       ]
   }
 };
-
-
-
 
 export default nextConfig;

@@ -81,14 +81,19 @@ export default function SellerReview() {
     setIsSubmitting(true);
     try {
       // Gọi Server Action (đã check role Seller ở backend)
-      await HandleUpdateReview({ reply: replyContent }, reviewId);
-      
+      const res = await HandleUpdateReview({ reply: replyContent }, reviewId);
+
+      if (!res?.success) {
+        toast.error(res?.error || 'Có lỗi xảy ra khi cập nhật đánh giá');
+        return;
+      }
+
       toast.success('Đã gửi phản hồi thành công');
       setReplyingId(null);
       setReplyContent('');
       fetchReviews(); // Refresh lại list
     } catch (error: any) {
-      toast.error(error.message || 'Có lỗi xảy ra');
+      toast.error(error?.message || 'Có lỗi xảy ra');
     } finally {
       setIsSubmitting(false);
     }

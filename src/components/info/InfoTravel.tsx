@@ -41,7 +41,7 @@ const milestonesWithImages = [
     description:
       'Hà Tĩnh giữ vị trí chiến lược quân sự quan trọng. Thời kỳ này hình thành nên cốt cách con người kiên trung và kho tàng văn hóa dân gian Ví, Giặm đặc sắc (Di sản văn hóa phi vật thể đại diện của nhân loại).',
     image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349424/qpveehw8urt1otksmtkr.jpg',
+      'https://lh3.googleusercontent.com/d/1KB3JBHo3methit_BQoWJcw4AcVwx2nfU',
     icon: History,
   },
   {
@@ -50,7 +50,7 @@ const milestonesWithImages = [
     description:
       'Biểu tượng của chủ nghĩa anh hùng cách mạng. Sự hy sinh của 10 nữ thanh niên xung phong đã biến nơi đây thành "địa chỉ đỏ" giáo dục truyền thống và điểm du lịch tâm linh trọng điểm.',
     image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/sz0f6vhhsqhgmbgrr1ki.jpg',
+      'https://lh3.googleusercontent.com/d/16WNlpRKUDBHLdCUwkcj25ULKfvsP6Jbl',
     icon: MapPin,
   },
   {
@@ -66,9 +66,9 @@ const milestonesWithImages = [
     year: '2020 - Nay',
     title: 'Phát Triển Du Lịch Xanh & Đa Trải Nghiệm',
     description:
-      'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn QG Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
+      'Chuyển mình mạnh mẽ sang du lịch sinh thái (Vườn Quốc gia Vũ Quang, Hồ Kẻ Gỗ) và nghỉ dưỡng cao cấp kết hợp sân golf, hướng tới mục tiêu điểm đến bốn mùa bền vững.',
     image:
-      'https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/ep25kbhtvai4xbsugwag.jpg',
+      'https://res.cloudinary.com/dpciotkix/image/upload/v1765463739/du-lich-ha-tinh-cam-nang-du-lich-va-22-dia-diem-dep-hap-dan-du-khach-202308091618134333_ormlyw.jpg',
     icon: Mountain,
   },
 ];
@@ -89,6 +89,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
       </div>
     );
   }
+  console.log(arts);
 
   return (
     <main className='bg-slate-50 font-sans text-slate-900 overflow-x-hidden'>
@@ -96,7 +97,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
       <section className='relative w-full h-[90vh] flex items-center justify-center overflow-hidden'>
         <div className='absolute inset-0 z-0'>
           <img
-            src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764818773/zzfpepqrx1sps9f1muk7.jpg'
+            src='https://res.cloudinary.com/dpciotkix/image/upload/v1765463626/i1mages_bf0tri.jpg'
             alt='Ha Tinh Landscape'
             className='w-full h-full object-cover brightness-[0.75]'
             loading='eager'
@@ -198,7 +199,7 @@ export default function HaTinhLandingPage({ data, foods, arts }: Props) {
             <div className='relative h-[500px]'>
               <div className='absolute top-0 right-0 w-4/5 h-4/5 rounded-2xl overflow-hidden shadow-2xl z-10 hover:shadow-3xl transition-shadow duration-500'>
                 <img
-                  src='https://res.cloudinary.com/dceqnckf1/image/upload/v1764349449/vq6jjkn13vuosh5ekyap.jpg'
+                  src='https://lh3.googleusercontent.com/d/1GSUCJBHZ_1_jhkpA0-jj8hmj2Dn6MCXS'
                   className='w-full h-full object-cover hover:scale-105 transition-transform duration-700'
                   alt='Khu lưu niệm Nguyễn Du'
                   loading='lazy'

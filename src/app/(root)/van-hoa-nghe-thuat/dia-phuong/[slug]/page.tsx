@@ -1,0 +1,31 @@
+// src/app/(root)/dia-diem-du-lich/[slug]/page.tsx
+import { notFound } from 'next/navigation'
+
+import FoodDetail from '@/model/food/FoodDetail'
+import { IFood } from '@/interfaces/IFood'
+import ListFood from '@/model/food/ListFood'
+import { IArt } from '@/interfaces/IArt'
+import ListArt from '@/model/art/ListArt'
+
+async function fetchArt(slug: string): Promise<IArt[] | null> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/art/ward/${slug}`, {
+    next: { revalidate: 60 }, // hoặc cache: 'no-store' nếu cần
+  })
+  if (!res.ok) return null
+  const data = await res.json()
+  return data.data
+}
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  // 🔧 quan trọng: await params
+  const { slug } = await params
+  const data = await fetchArt(slug)
+  if (!data) return <p>Không có dữ liệu</p>
+
+  return <ListArt art={data} />
+
+}

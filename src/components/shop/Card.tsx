@@ -80,7 +80,7 @@ const CardShop = ({ shop }: { shop: IShop }) => {
 
 // 2. Export default ListCard
 // Đổi tên prop đầu vào thành 'data' để khớp với cách gọi bên Page
-export default function ListCard({ data }: { data: IShop[] }) {
+export default function ListShop({ data }: { data: IShop[] }) {
   // Kiểm tra nếu không có data thì không render hoặc báo lỗi nhẹ
   if (!data || data.length === 0) {
     return <p className='text-gray-500'>Chưa có cửa hàng nào.</p>;

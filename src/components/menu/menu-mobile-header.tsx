@@ -8,9 +8,9 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
-import { IDistricts } from '@/interfaces/IAddress';
+import {  IWards } from '@/interfaces/IAddress';
 
-export default function MenuMobileHeader({ districts }: { districts: IDistricts[] }) {
+export default function MenuMobileHeader({ wards }: { wards: IWards[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -41,9 +41,9 @@ export default function MenuMobileHeader({ districts }: { districts: IDistricts[
                 <AccordionTrigger className="rounded-lg px-3 py-2 hover:bg-primary/10">
                   Địa điểm du lịch
                 </AccordionTrigger>
-                <AccordionContent className="pl-3">
+                <AccordionContent className="pl-3 overflow-y-auto max-h-80">
                   <div className="grid gap-1">
-                    {districts.slice(0, 16).map((d) => (
+                    {wards.map((d) => (
                       <Link
                         key={d.codename}
                         href={`/dia-diem/${d.codename}`}
@@ -61,9 +61,9 @@ export default function MenuMobileHeader({ districts }: { districts: IDistricts[
                 <AccordionTrigger className="rounded-lg px-3 py-2 hover:bg-primary/10">
                   Đặc sản địa phương
                 </AccordionTrigger>
-                <AccordionContent className="pl-3">
+                <AccordionContent className="pl-3 overflow-y-auto max-h-80">
                   <div className="grid gap-1">
-                    {districts.slice(0, 16).map((d) => (
+                    {wards.map((d) => (
                       <Link
                         key={d.codename}
                         href={`/dac-san/${d.codename}`}

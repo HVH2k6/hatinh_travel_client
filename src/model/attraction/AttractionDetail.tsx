@@ -28,6 +28,7 @@ import Gallery from '@/components/attraction/Gallery';
 import { IAttraction } from '@/interfaces/IAttraction';
 import PriceDisplay from '@/helper/covertMoney';
 import ReviewSection from '@/components/review/ReviewSection';
+import ExpandableDescription from '@/components/content/ContentLoad';
 
 type Named = { name?: string };
 
@@ -153,7 +154,7 @@ function buildAddressString(a: IAttraction['address']): string {
   return [
     a?.detail,
     (a?.wardId as Named)?.name,
-    (a?.districtId as Named)?.name,
+    
     (a?.provinceId as Named)?.name,
   ]
     .filter(Boolean)
@@ -370,17 +371,11 @@ export default function AttractionDetail({
                 </CardTitle>
               </CardHeader>
               <CardContent className='p-6'>
-                <article
-                  className='prose prose-lg max-w-none dark:prose-invert 
-                             prose-headings:text-gray-900 prose-headings:font-bold prose-headings:mb-4
-                             prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
-                             prose-li:text-gray-700 prose-li:mb-2
-                             prose-strong:text-gray-900 prose-strong:font-semibold
-                             prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline'
-                  dangerouslySetInnerHTML={{
-                    __html: attraction.description || '',
-                  }}
-                />
+              
+                <ExpandableDescription
+                                content={attraction.description}
+                                maxHeight={200}
+                              />
               </CardContent>
             </Card>
 

@@ -1,8 +1,8 @@
-import { IDistricts, IProvinces, IWards } from "./IAddress";
+import {  IProvinces, IWards } from "./IAddress";
 import { ICategory } from "./ICategory";
 interface Address {
   provinceId: IProvinces; // nếu có thể nhận _id thuần: IProvinces | string
-  districtId: IDistricts;
+  
   wardId: IWards;
   detail?: string;
 }

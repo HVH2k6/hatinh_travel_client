@@ -2,10 +2,12 @@ import {
   Cake,
   FileType,
   Map,
+  MessageCircle,
+  Music,
   Scale,
   ShoppingBag,
   SquareMenu,
-  SquareTerminal,
+  // VscCodeReview ,
 } from 'lucide-react';
 
 export const STATUS = {
@@ -68,7 +70,7 @@ export const menuSidebarAdmin = [
         url: '/quan-ly/danh-muc',
       },
       {
-        title: 'Tạo mới địa điểm',
+        title: 'Tạo mới danh mục',
         url: '/quan-ly/danh-muc/tao-moi',
       },
     ],
@@ -129,6 +131,38 @@ export const menuSidebarAdmin = [
       },
     ],
   },
+   {
+    title: 'Văn hóa nghệ thuật',
+    url: '#',
+    icon: Music,
+    page: 'admin',
+
+    items: [
+      {
+        title: 'Danh sách văn hóa nghệ thuật',
+        url: '/quan-ly/van-hoa-nghe-thuat',
+      },
+   
+      {
+        title: 'Tạo mới văn hóa nghệ thuật',
+        url: '/quan-ly/van-hoa-nghe-thuat/tao-moi',
+      },
+    ],
+  },
+    {
+    title: 'Review',
+    url: '#',
+    icon: MessageCircle,
+    page: 'admin',
+
+    items: [
+      {
+        title: 'Danh sách',
+        url: '/quan-ly/review',
+      },
+   
+    ],
+  },
   {
     title: 'Đơn vị tính',
     url: '#',
@@ -145,6 +179,7 @@ export const menuSidebarAdmin = [
         url: '/quan-ly/don-vi-tinh/tao-moi',
       },
     ],
+    
   },
   {
     title: 'Cửa hàng',

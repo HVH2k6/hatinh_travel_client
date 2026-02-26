@@ -33,7 +33,7 @@ export function NavigationMenuHeader({ menu }: { menu: IMenu[] }) {
                   {item.title}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="rounded-2xl shadow-lg">
-                  <ul className="grid w-[480px] grid-cols-2 gap-2 p-4">
+                  <ul className="grid w-[520px] grid-cols-3 gap-2 p-4">
                     {item.children?.map((c, idx) => (
                       <li key={idx}>
                         <NavigationMenuLink asChild>
